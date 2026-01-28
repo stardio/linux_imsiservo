@@ -1,0 +1,24 @@
+﻿<Window x:Class="EtherCAT_Studio.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="EtherCAT Studio" Height="600" Width="1000"
+        Background="#1E1E1E">
+
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="70"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <!-- Toolbox -->
+        <StackPanel Grid.Column="0" Background="#232323" Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <Button Content="M" ToolTip="Motion" Background="#2176FF" Foreground="White" Height="60" FontSize="24" Click="AddMotionNode_Click" Margin="5"/>
+            <Button Content="W" ToolTip="Wait/Time" Background="#FF8800" Foreground="White" Height="60" FontSize="24" Click="AddWaitNode_Click" Margin="5"/>
+            <Button Content="I" ToolTip="IO/Signal" Background="#22C55E" Foreground="White" Height="60" FontSize="24" Click="AddIONode_Click" Margin="5"/>
+            <Button Content="F" ToolTip="Flow" Background="#FF3B30" Foreground="White" Height="60" FontSize="24" Click="AddFlowNode_Click" Margin="5"/>
+            <Button Content="S" ToolTip="System" Background="#888" Foreground="White" Height="60" FontSize="24" Click="AddSystemNode_Click" Margin="5"/>
+        </StackPanel>
+        <!-- Main Canvas -->
+        <Canvas x:Name="MainCanvas" Grid.Column="1" Background="#232323"/>
+    </Grid>
+</Window>
