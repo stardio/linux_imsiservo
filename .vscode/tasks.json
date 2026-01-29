@@ -420,6 +420,126 @@
 				"$msCompile"
 			],
 			"group": "build"
+		},
+		{
+			"label": "Build EtherCAT_Studio",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build"
+			],
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build EtherCAT_Studio",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build"
+			],
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build EtherCAT_Studio",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build"
+			],
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build EtherCAT_Studio",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build"
+			],
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build EtherCAT_Studio",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build"
+			],
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build EtherCAT_Studio",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build"
+			],
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build EtherCAT_Studio",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build"
+			],
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build EtherCAT_Studio",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build"
+			],
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build EtherCAT_Studio",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build"
+			],
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build EtherCAT_Studio",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build"
+			],
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
 		}
 	]
 }

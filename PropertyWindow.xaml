@@ -4,27 +4,101 @@
         Title="속성 편집" Height="320" Width="400"
         WindowStartupLocation="CenterOwner"
         Background="#232323" Foreground="White" ResizeMode="NoResize">
-    <Grid Margin="20">
+    <Window.Resources>
+        <!-- Ensure ComboBox popup and other system-drawn controls use dark brushes -->
+        <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#000000" />
+        <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#000000" />
+        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#111111" />
+        <SolidColorBrush x:Key="{x:Static SystemColors.WindowTextBrushKey}" Color="White" />
+        <!-- Dark ComboBox template for popup/toggle visuals -->
+        <Style x:Key="DarkComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="#000" />
+            <Setter Property="BorderBrush" Value="#444" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton Name="ToggleButton"
+                                          Grid.Column="2"
+                                          Focusable="False"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                          Foreground="{TemplateBinding Foreground}">
+                                <Grid>
+                                    <ContentPresenter Name="ContentSite"
+                                                      Content="{TemplateBinding SelectionBoxItem}"
+                                                      ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                      Margin="6,0,25,0"
+                                                      VerticalAlignment="Center"/>
+                                    <Path HorizontalAlignment="Right" Margin="0,0,6,0" VerticalAlignment="Center" Data="M 0 0 L 4 4 L 8 0 Z" Fill="White"/>
+                                </Grid>
+                            </ToggleButton>
+                            <Popup Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
+                                <Border Name="DropDownBorder" Background="#000" BorderBrush="#444" BorderThickness="1">
+                                    <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" Background="#000"/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+        <Grid Margin="20">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="70"/>
+            <ColumnDefinition Width="80"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TextBlock Text="Action" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
-        <TextBox x:Name="ActionBox" Grid.Row="0" Grid.Column="1" Margin="0,0,0,4" Background="#333" Foreground="White"/>
-        <TextBlock Text="Target" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
-        <TextBox x:Name="TargetBox" Grid.Row="1" Grid.Column="1" Margin="0,0,0,4" Background="#333" Foreground="White"/>
-        <TextBlock Text="Speed" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
-        <TextBox x:Name="SpeedBox" Grid.Row="2" Grid.Column="1" Margin="0,0,0,4" Background="#333" Foreground="White"/>
-        <TextBlock Text="Comment" Grid.Row="3" Grid.Column="0" Margin="0,4,0,0"/>
-        <TextBox x:Name="CommentBox" Grid.Row="3" Grid.Column="1" Margin="0,0,0,4" Background="#333" Foreground="White" AcceptsReturn="True"/>
-        <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+        <TextBlock Text="Label" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
+        <TextBox x:Name="LabelBox" Grid.Row="0" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White"/>
+
+        <TextBlock Text="Jump Target" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
+        <TextBox x:Name="JumpTargetBox" Grid.Row="1" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White"/>
+
+        <TextBlock Text="Axis" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
+        <ComboBox x:Name="AxisBox" Grid.Row="2" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White" Style="{StaticResource DarkComboBoxStyle}">
+            <ComboBox.ItemContainerStyle>
+                <Style TargetType="ComboBoxItem">
+                    <Setter Property="Background" Value="#000" />
+                    <Setter Property="Foreground" Value="White" />
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="#000" />
+                            <Setter Property="Foreground" Value="White" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#111" />
+                            <Setter Property="Foreground" Value="White" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ComboBox.ItemContainerStyle>
+            <ComboBoxItem Content="X" />
+            <ComboBoxItem Content="Y" />
+            <ComboBoxItem Content="Z" />
+        </ComboBox>
+        <TextBlock Text="Position" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
+        <TextBox x:Name="PositionBox" Grid.Row="3" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White"/>
+        <TextBlock Text="Speed" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
+        <TextBox x:Name="SpeedBox" Grid.Row="4" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White"/>
+        <TextBlock Text="Description" Grid.Row="5" Grid.Column="0" Margin="0,4,0,0"/>
+        <TextBox x:Name="DescriptionBox" Grid.Row="5" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White" AcceptsReturn="True"/>
+        <StackPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
             <Button Content="확인" Width="80" Margin="0,0,8,0" Click="Ok_Click" Background="#0078D7" Foreground="White"/>
             <Button Content="취소" Width="80" Click="Cancel_Click" Background="#444" Foreground="White"/>
         </StackPanel>

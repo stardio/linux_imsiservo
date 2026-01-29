@@ -1,0 +1,17 @@
+[
+    {
+        "key": "ctrl+f9",
+        "command": "multiCommand.dotnetClean",
+        "when": "editorTextFocus || terminalFocus"
+    },
+    {
+        "key": "ctrl+f10",
+        "command": "multiCommand.dotnetBuild",
+        "when": "editorTextFocus || terminalFocus"
+    },
+    {
+        "key": "ctrl+f11",
+        "command": "multiCommand.dotnetRun",
+        "when": "editorTextFocus || terminalFocus"
+    }
+]

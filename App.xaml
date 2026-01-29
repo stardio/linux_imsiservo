@@ -4,6 +4,10 @@
              xmlns:local="clr-namespace:EtherCAT_Studio"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        
+        <!-- Dark mode system brush overrides -->
+        <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#000000" />
+        <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#000000" />
+        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#111111" />
+        <SolidColorBrush x:Key="{x:Static SystemColors.WindowTextBrushKey}" Color="White" />
     </Application.Resources>
 </Application>

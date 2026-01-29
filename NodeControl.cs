@@ -9,8 +9,23 @@ namespace EtherCAT_Studio
     // 노드 컨트롤 (포트 포함)
     public class NodeControl : Canvas
     {
-        public Ellipse InputPort { get; }
-        public Ellipse OutputPort { get; }
+        private Border _backgroundBorder;
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set
+            {
+                _isSelected = value;
+                if (_backgroundBorder != null)
+                {
+                    _backgroundBorder.BorderBrush = _isSelected ? Brushes.Cyan : Brushes.White;
+                    _backgroundBorder.BorderThickness = _isSelected ? new Thickness(3) : new Thickness(2);
+                }
+            }
+        }
+        public Ellipse? InputPort { get; }
+        public Ellipse? OutputPort { get; }
         public TextBlock Label { get; }
         public MainWindow Main { get; }
         bool _isDragging;
@@ -18,11 +33,14 @@ namespace EtherCAT_Studio
 
         public MainWindow.PortInfo InputPortInfo { get; }
         public MainWindow.PortInfo OutputPortInfo { get; }
+        public string NodeType { get; }
 
-        public NodeControl(string text, Brush color, MainWindow main)
+        public string? JsonData { get; set; } // 노드별 JSON 데이터 저장
+
+        public NodeControl(string text, Brush color, MainWindow main, double portSize = 16, double width = 140, double height = 48, bool hasInput = true, bool hasOutput = true)
         {
             Main = main;
-            Width = 140; Height = 48;
+            Width = width; Height = height;
 
             // 배경
             var border = new Border
@@ -33,31 +51,46 @@ namespace EtherCAT_Studio
                 BorderBrush = Brushes.White,
                 BorderThickness = new Thickness(2)
             };
-            Children.Add(border);
+            _backgroundBorder = border;
+            Children.Add(_backgroundBorder);
 
-            // 입력 포트
-            InputPort = new Ellipse
+            // 입력 포트 (옵션)
+            if (hasInput)
             {
-                Width = 16, Height = 16,
-                Fill = Brushes.Gray,
-                Stroke = Brushes.White,
-                StrokeThickness = 1.5,
-                Cursor = Cursors.Hand
-            };
-            SetLeft(InputPort, -8); SetTop(InputPort, 16);
-            Children.Add(InputPort);
+                InputPort = new Ellipse
+                {
+                    Width = portSize, Height = portSize,
+                    Fill = Brushes.Gray,
+                    Stroke = Brushes.White,
+                    StrokeThickness = 1.5,
+                    Cursor = Cursors.Hand
+                };
+                SetLeft(InputPort, -portSize / 2); SetTop(InputPort, (Height - portSize) / 2);
+                Children.Add(InputPort);
+            }
+            else
+            {
+                InputPort = null;
+            }
 
             // 출력 포트
-            OutputPort = new Ellipse
+            if (hasOutput)
             {
-                Width = 16, Height = 16,
-                Fill = Brushes.Gray,
-                Stroke = Brushes.White,
-                StrokeThickness = 1.5,
-                Cursor = Cursors.Hand
-            };
-            SetLeft(OutputPort, 132); SetTop(OutputPort, 16);
-            Children.Add(OutputPort);
+                OutputPort = new Ellipse
+                {
+                    Width = portSize, Height = portSize,
+                    Fill = Brushes.Gray,
+                    Stroke = Brushes.White,
+                    StrokeThickness = 1.5,
+                    Cursor = Cursors.Hand
+                };
+                SetLeft(OutputPort, Width - (portSize / 2)); SetTop(OutputPort, (Height - portSize) / 2);
+                Children.Add(OutputPort);
+            }
+            else
+            {
+                OutputPort = null;
+            }
 
             // 라벨
             Label = new TextBlock
@@ -66,44 +99,84 @@ namespace EtherCAT_Studio
                 Foreground = Brushes.White,
                 FontWeight = FontWeights.Bold,
                 FontSize = 16,
-                Width = 120,
+                Width = Width - 20,
                 TextAlignment = TextAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center
             };
-            SetLeft(Label, 10); SetTop(Label, 12);
+            SetLeft(Label, 10); SetTop(Label, (Height - 16) / 2);
             Children.Add(Label);
+
+            // 노드 타입
+            NodeType = text;
 
             // 포트 정보
             InputPortInfo = new MainWindow.PortInfo { Type = MainWindow.PortType.Input, Node = this, Ellipse = InputPort };
             OutputPortInfo = new MainWindow.PortInfo { Type = MainWindow.PortType.Output, Node = this, Ellipse = OutputPort };
 
             // 포트 하이라이트
-            InputPort.MouseEnter += (s, e) => InputPort.Fill = Brushes.LimeGreen;
-            InputPort.MouseLeave += (s, e) => InputPort.Fill = Brushes.Gray;
-            OutputPort.MouseEnter += (s, e) => OutputPort.Fill = Brushes.Orange;
-            OutputPort.MouseLeave += (s, e) => OutputPort.Fill = Brushes.Gray;
+            if (InputPort != null)
+            {
+                InputPort.MouseEnter += (s, e) => InputPort.Fill = Brushes.LimeGreen;
+                InputPort.MouseLeave += (s, e) => InputPort.Fill = Brushes.Gray;
+            }
+            if (OutputPort != null)
+            {
+                OutputPort.MouseEnter += (s, e) => OutputPort.Fill = Brushes.Orange;
+                OutputPort.MouseLeave += (s, e) => OutputPort.Fill = Brushes.Gray;
+            }
 
-            // 와이어 드래그
-            OutputPort.MouseLeftButtonDown += (s, e) => {
-                Main.StartWireDrag(OutputPortInfo, e);
-                e.Handled = true;
-            };
+            // 와이어 드래그 (출력 포트가 있는 경우)
+            if (OutputPort != null)
+            {
+                OutputPort.MouseLeftButtonDown += (s, e) => {
+                    Main.StartWireDrag(OutputPortInfo, e);
+                    e.Handled = true;
+                };
+            }
 
             // 노드 드래그
             MouseLeftButtonDown += Node_MouseLeftButtonDown;
             MouseMove += Node_MouseMove;
             MouseLeftButtonUp += Node_MouseLeftButtonUp;
+            // 노드 더블클릭: 속성 입력창
+            MouseLeftButtonDown += Node_DoubleClick;
+        }
+
+        // 더블클릭 시 PropertyWindow 띄우기
+        private void Node_DoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                var win = new PropertyWindow(JsonData);
+                if (win.ShowDialog() == true && !string.IsNullOrEmpty(win.JsonResult))
+                {
+                        JsonData = win.JsonResult;
+                        try
+                        {
+                            var doc = System.Text.Json.JsonDocument.Parse(JsonData);
+                            if (doc.RootElement.TryGetProperty("label", out var lbl) && lbl.ValueKind == System.Text.Json.JsonValueKind.String)
+                            {
+                                var newLabel = lbl.GetString();
+                                if (!string.IsNullOrEmpty(newLabel)) Label.Text = newLabel;
+                            }
+                        }
+                        catch { }
+                }
+            }
         }
 
         // 포트의 Canvas 내 실제 위치 반환
         public Point GetPortPosition(MainWindow.PortInfo port, Canvas canvas)
         {
+            if (port?.Ellipse == null)
+                return new Point(0, 0);
             return port.Ellipse.TranslatePoint(new Point(port.Ellipse.Width / 2, port.Ellipse.Height / 2), canvas);
         }
 
         // 노드 드래그
-        void Node_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+            void Node_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+                Main?.SelectNode(this);
             _isDragging = true;
             _dragOffset = e.GetPosition(this);
             CaptureMouse();
@@ -112,10 +185,12 @@ namespace EtherCAT_Studio
         {
             if (_isDragging && e.LeftButton == MouseButtonState.Pressed)
             {
-                var pos = e.GetPosition(Parent as Canvas);
+                var parentCanvas = Parent as Canvas;
+                if (parentCanvas == null) return;
+                var pos = e.GetPosition(parentCanvas);
                 Canvas.SetLeft(this, pos.X - _dragOffset.X);
                 Canvas.SetTop(this, pos.Y - _dragOffset.Y);
-                Main.NodeMoved(this);
+                Main?.NodeMoved(this);
             }
         }
         void Node_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)

@@ -19,3 +19,6 @@ C:\EtherCAT_Studio\obj\Debug\net8.0-windows\EtherCAT_Studio.genruntimeconfig.cac
 C:\EtherCAT_Studio\obj\Debug\net8.0-windows\ref\EtherCAT_Studio.dll
 C:\EtherCAT_Studio\obj\Debug\net8.0-windows\PropertyWindow.baml
 C:\EtherCAT_Studio\obj\Debug\net8.0-windows\PropertyWindow.g.cs
+C:\EtherCAT_Studio\obj\Debug\net8.0-windows\EtherCAT_Studio.sourcelink.json
+C:\EtherCAT_Studio\obj\Debug\net8.0-windows\EtherCAT_Studio_MarkupCompile.lref
+C:\EtherCAT_Studio\obj\Debug\net8.0-windows\App.baml

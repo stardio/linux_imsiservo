@@ -26,43 +26,139 @@ namespace EtherCAT_Studio
         }
 
         private readonly List<Connection> _connections = new();
+        private NodeControl? _selectedNode = null;
+        private Connection? _selectedConnection = null;
         private PortInfo? _draggingFromPort = null;
         private Path? _tempWire = null;
 
         public MainWindow()
         {
             InitializeComponent();
+            this.PreviewKeyDown += MainWindow_PreviewKeyDown;
+            MainCanvas.MouseLeftButtonDown += MainCanvas_MouseLeftButtonDown_ClearSelection;
+        }
+
+        private void MainCanvas_MouseLeftButtonDown_ClearSelection(object? sender, MouseButtonEventArgs e)
+        {
+            // click on canvas background clears selection
+            if (e.Source == MainCanvas)
+            {
+                ClearSelection();
+            }
+        }
+
+        public void SelectNode(NodeControl node)
+        {
+            ClearSelection();
+            _selectedNode = node;
+            _selectedNode.IsSelected = true;
+        }
+
+        public void SelectConnection(Connection conn)
+        {
+            ClearSelection();
+            _selectedConnection = conn;
+            if (conn.Path != null)
+            {
+                conn.Path.Stroke = Brushes.Cyan;
+                conn.Path.StrokeThickness = 4;
+            }
+        }
+
+        private void ClearSelection()
+        {
+            if (_selectedNode != null)
+            {
+                _selectedNode.IsSelected = false;
+                _selectedNode = null;
+            }
+            if (_selectedConnection != null)
+            {
+                if (_selectedConnection.Path != null)
+                {
+                    _selectedConnection.Path.Stroke = Brushes.Yellow;
+                    _selectedConnection.Path.StrokeThickness = 3;
+                }
+                _selectedConnection = null;
+            }
+        }
+
+        private void MainWindow_PreviewKeyDown(object? sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete)
+            {
+                if (_selectedConnection != null)
+                {
+                    // remove path and connection
+                    if (_selectedConnection.Path != null)
+                        MainCanvas.Children.Remove(_selectedConnection.Path);
+                    _connections.Remove(_selectedConnection);
+                    _selectedConnection = null;
+                    e.Handled = true;
+                    return;
+                }
+                if (_selectedNode != null)
+                {
+                    // remove any connections attached to node
+                    var toRemove = _connections.Where(c => c.From?.Node == _selectedNode || c.To?.Node == _selectedNode).ToList();
+                    foreach (var c in toRemove)
+                    {
+                        if (c.Path != null) MainCanvas.Children.Remove(c.Path);
+                        _connections.Remove(c);
+                    }
+                    // remove node
+                    MainCanvas.Children.Remove(_selectedNode);
+                    _selectedNode = null;
+                    e.Handled = true;
+                    return;
+                }
+            }
         }
 
         private void AddMotionNode_Click(object sender, RoutedEventArgs e)
         {
-            AddNode("Motion", Brushes.CornflowerBlue);
+            AddNode("ABS MOVE", Brushes.CornflowerBlue);
         }
 
         private void AddWaitNode_Click(object sender, RoutedEventArgs e)
         {
-            AddNode("Wait", Brushes.Orange);
+            AddNode("WAIT", Brushes.Orange);
         }
-
-        private void AddIONode_Click(object sender, RoutedEventArgs e)
+        private void AddSetDo_Click(object sender, RoutedEventArgs e)
         {
-            AddNode("IO", Brushes.LimeGreen);
+            AddNode("SET DO", Brushes.LimeGreen);
         }
 
-        private void AddFlowNode_Click(object sender, RoutedEventArgs e)
+        private void AddCheckDi_Click(object sender, RoutedEventArgs e)
         {
-            AddNode("Flow", Brushes.IndianRed);
+            AddNode("CHECK DI", Brushes.Gold);
         }
 
-        private void AddSystemNode_Click(object sender, RoutedEventArgs e)
+        private void AddGoto_Click(object sender, RoutedEventArgs e)
         {
-            AddNode("System", Brushes.Gray);
+            AddNode("GOTO", Brushes.IndianRed);
         }
 
-        private void AddNode(string text, Brush color)
+        private void AddJump_Click(object sender, RoutedEventArgs e)
+        {
+            AddNode("JUMP", Brushes.MediumPurple);
+        }
+        private void AddJumpImport_Click(object sender, RoutedEventArgs e)
+        {
+            // smaller outer size (half) and only input port on left; keep port size default (16)
+            AddNode("JUMP IMPORT", Brushes.MediumPurple, 16, 70, 24, hasInput: true, hasOutput: false);
+        }
+
+        private void AddJumpExport_Click(object sender, RoutedEventArgs e)
+        {
+            // smaller outer size (half) and only output port on right; keep port size default (16)
+            AddNode("JUMP EXPORT", Brushes.MediumPurple, 16, 70, 24, hasInput: false, hasOutput: true);
+        }
+
+        private void AddNode(string text, Brush color, double portSize = 16, double width = 140, double height = 48, bool hasInput = true, bool hasOutput = true)
         {
             // NodeControl 인스턴스 생성 (색상 전달)
-            var node = new NodeControl(text, color, this);
+            var node = new NodeControl(text, color, this, portSize, width, height, hasInput, hasOutput);
 
             // 캔버스에 임의의 위치(계단식)로 배치
             double offset = 20 + (MainCanvas.Children.Count * 20);
@@ -129,6 +225,9 @@ namespace EtherCAT_Studio
                         };
                         if (conn.Path != null)
                         {
+                            // make path clickable for selection
+                            conn.Path.IsHitTestVisible = true;
+                            conn.Path.MouseLeftButtonDown += (s, args) => { SelectConnection(conn); args.Handled = true; };
                             MainCanvas.Children.Add(conn.Path);
                         }
                         _connections.Add(conn);
@@ -177,6 +276,138 @@ namespace EtherCAT_Studio
             {
                 if ((conn.From?.Node == node) || (conn.To?.Node == node))
                     UpdateConnectionPath(conn);
+            }
+        }
+        // 저장 버튼 클릭 시 모든 노드를 시퀀스 JSON 구조로 파일로 저장
+        private void SaveJson_Click(object sender, RoutedEventArgs e)
+        {
+            var steps = new List<object>();
+            int idx = 1;
+            var nodes = new List<NodeControl>();
+            foreach (var child in MainCanvas.Children)
+            {
+                if (child is NodeControl node)
+                    nodes.Add(node);
+            }
+            if (nodes.Count == 0)
+            {
+                MessageBox.Show("저장할 노드가 없습니다.");
+                return;
+            }
+
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                var node = nodes[i];
+                string id = $"node_{idx:00}";
+                idx++;
+                string type = (node.NodeType ?? "").ToUpperInvariant();
+                type = type switch
+                {
+                    "MOTION" => "MOTION",
+                    "M" => "MOTION",
+                    "ABS MOVE" => "MOTION",
+                    "WAIT" => "WAIT",
+                    "IO" => "IO",
+                    "SET DO" => "IO",
+                    "CHECK DI" => "IO",
+                    "FLOW" => "FLOW",
+                    "GOTO" => "FLOW",
+                    "JUMP" => "GOTO",
+                    "JUMP IMPORT" => "GOTO",
+                    "JUMP EXPORT" => "GOTO",
+                    "SYSTEM" => "SYSTEM",
+                    _ => type
+                };
+
+                object paramsObj = new { };
+                if (!string.IsNullOrEmpty(node.JsonData))
+                {
+                        try
+                        {
+                            var doc = System.Text.Json.JsonDocument.Parse(node.JsonData);
+                            var root = doc.RootElement;
+
+                            static string GetPropString(System.Text.Json.JsonElement el, string name, string def)
+                            {
+                                if (!el.TryGetProperty(name, out var p)) return def;
+                                if (p.ValueKind == System.Text.Json.JsonValueKind.String)
+                                    return p.GetString() ?? def;
+                                var raw = p.GetRawText();
+                                return string.IsNullOrWhiteSpace(raw) ? def : raw.Trim('"');
+                            }
+
+                            static double GetPropDouble(System.Text.Json.JsonElement el, string name, double def)
+                            {
+                                if (!el.TryGetProperty(name, out var p)) return def;
+                                if (p.ValueKind == System.Text.Json.JsonValueKind.Number && p.TryGetDouble(out var d)) return d;
+                                if (p.ValueKind == System.Text.Json.JsonValueKind.String && double.TryParse(p.GetString(), out var d2)) return d2;
+                                return def;
+                            }
+
+                            if (type == "MOTION")
+                            {
+                                string axis = GetPropString(root, "axis", "X");
+                                double speed = GetPropDouble(root, "speed", 0);
+                                double pos = GetPropDouble(root, "position", GetPropDouble(root, "pos", 0));
+                                paramsObj = new { axis, pos, speed };
+                            }
+                            else if (type == "WAIT")
+                            {
+                                int delay = (int)GetPropDouble(root, "delay_ms", GetPropDouble(root, "delay", 0));
+                                paramsObj = new { delay_ms = delay };
+                            }
+                            else
+                            {
+                                if (root.TryGetProperty("params", out var p))
+                                {
+                                    paramsObj = System.Text.Json.JsonSerializer.Deserialize<object>(p.GetRawText()) ?? new { };
+                                }
+                            }
+                                // Handle jump/goto params (jump_target -> label)
+                                if (type == "GOTO")
+                                {
+                                    if (root.TryGetProperty("jump_target", out var jt) && jt.ValueKind == System.Text.Json.JsonValueKind.String)
+                                    {
+                                        paramsObj = new { label = jt.GetString() };
+                                    }
+                                    else if (root.TryGetProperty("label", out var lbl) && lbl.ValueKind == System.Text.Json.JsonValueKind.String)
+                                    {
+                                        paramsObj = new { label = lbl.GetString() };
+                                    }
+                                }
+                        }
+                        catch { }
+                }
+
+                string next = (i < nodes.Count - 1) ? $"node_{(i + 2):00}" : null;
+                var step = new Dictionary<string, object?>
+                {
+                    ["id"] = id,
+                    ["type"] = type,
+                    ["params"] = paramsObj,
+                    ["next"] = next
+                };
+                steps.Add(step);
+            }
+
+            var rootObj = new Dictionary<string, object>
+            {
+                ["sequence_name"] = "Sequence",
+                ["steps"] = steps
+            };
+
+            var options = new System.Text.Json.JsonSerializerOptions { WriteIndented = true };
+            string outJson = System.Text.Json.JsonSerializer.Serialize(rootObj, options);
+
+            var dlg = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = "JSON 파일 (*.json)|*.json|모든 파일 (*.*)|*.*",
+                FileName = "sequence.json"
+            };
+            if (dlg.ShowDialog() == true)
+            {
+                System.IO.File.WriteAllText(dlg.FileName, outJson);
+                MessageBox.Show("저장 완료: " + dlg.FileName);
             }
         }
     }

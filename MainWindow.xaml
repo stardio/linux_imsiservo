@@ -4,19 +4,43 @@
         Title="EtherCAT Studio" Height="600" Width="1000"
         Background="#1E1E1E">
 
+    <Window.Resources>
+        <Style x:Key="ToolButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="120"/>
+            <Setter Property="Height" Value="44"/>
+            <Setter Property="Margin" Value="6"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="8" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="70"/>
+            <ColumnDefinition Width="150"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <!-- Toolbox -->
-        <StackPanel Grid.Column="0" Background="#232323" Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-            <Button Content="M" ToolTip="Motion" Background="#2176FF" Foreground="White" Height="60" FontSize="24" Click="AddMotionNode_Click" Margin="5"/>
-            <Button Content="W" ToolTip="Wait/Time" Background="#FF8800" Foreground="White" Height="60" FontSize="24" Click="AddWaitNode_Click" Margin="5"/>
-            <Button Content="I" ToolTip="IO/Signal" Background="#22C55E" Foreground="White" Height="60" FontSize="24" Click="AddIONode_Click" Margin="5"/>
-            <Button Content="F" ToolTip="Flow" Background="#FF3B30" Foreground="White" Height="60" FontSize="24" Click="AddFlowNode_Click" Margin="5"/>
-            <Button Content="S" ToolTip="System" Background="#888" Foreground="White" Height="60" FontSize="24" Click="AddSystemNode_Click" Margin="5"/>
+        <StackPanel Grid.Column="0" Background="#232323" Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="150">
+            <Button Content="ABS MOVE" ToolTip="위치 제어 (절대 이동)" Background="#2176FF" Foreground="White" FontSize="14" Click="AddMotionNode_Click" Style="{StaticResource ToolButtonStyle}"/>
+            <Button Content="WAIT" ToolTip="시간 지연" Background="#FF8800" Foreground="White" FontSize="16" Click="AddWaitNode_Click" Style="{StaticResource ToolButtonStyle}"/>
+            <Button Content="SET DO" ToolTip="신호 출력" Background="#22C55E" Foreground="White" FontSize="14" Click="AddSetDo_Click" Style="{StaticResource ToolButtonStyle}"/>
+            <Button Content="CHECK DI" ToolTip="센서 확인" Background="#F59E0B" Foreground="White" FontSize="14" Click="AddCheckDi_Click" Style="{StaticResource ToolButtonStyle}"/>
+            <Button Content="GOTO" ToolTip="반복/이동" Background="#FF3B30" Foreground="White" FontSize="16" Click="AddGoto_Click" Style="{StaticResource ToolButtonStyle}"/>
+            <Button Content="JUMP IMPORT" ToolTip="와이어 점프 터미널 (Import)" Background="#7C3AED" Foreground="White" FontSize="12" Click="AddJumpImport_Click" Style="{StaticResource ToolButtonStyle}"/>
+            <Button Content="JUMP EXPORT" ToolTip="와이어 점프 터미널 (Export)" Background="#6D28D9" Foreground="White" FontSize="12" Click="AddJumpExport_Click" Style="{StaticResource ToolButtonStyle}"/>
+            <Button Content="저장" ToolTip="JSON 저장" Background="#0078D7" Foreground="White" FontSize="16" Click="SaveJson_Click" Margin="0,24,0,0" Style="{StaticResource ToolButtonStyle}"/>
         </StackPanel>
         <!-- Main Canvas -->
         <Canvas x:Name="MainCanvas" Grid.Column="1" Background="#232323"/>
