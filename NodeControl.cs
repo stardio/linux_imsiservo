@@ -45,7 +45,7 @@ namespace EtherCAT_Studio
             // 배경
             var border = new Border
             {
-                Width = 140, Height = 48,
+                Width = width, Height = height,
                 Background = color,
                 CornerRadius = new CornerRadius(8),
                 BorderBrush = Brushes.White,
@@ -93,18 +93,27 @@ namespace EtherCAT_Studio
             }
 
             // 라벨
+            // centered text inside a Grid so the text baseline is vertically centered
+            var contentGrid = new Grid
+            {
+                Width = width,
+                Height = height
+            };
             Label = new TextBlock
             {
                 Text = text,
                 Foreground = Brushes.White,
                 FontWeight = FontWeights.Bold,
                 FontSize = 16,
-                Width = Width - 20,
                 TextAlignment = TextAlignment.Center,
+                TextWrapping = TextWrapping.NoWrap,
+                HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center
             };
-            SetLeft(Label, 10); SetTop(Label, (Height - 16) / 2);
-            Children.Add(Label);
+            contentGrid.Children.Add(Label);
+            SetLeft(contentGrid, 0);
+            SetTop(contentGrid, 0);
+            Children.Add(contentGrid);
 
             // 노드 타입
             NodeType = text;

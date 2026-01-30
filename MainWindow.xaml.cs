@@ -145,14 +145,14 @@ namespace EtherCAT_Studio
         }
         private void AddJumpImport_Click(object sender, RoutedEventArgs e)
         {
-            // smaller outer size (half) and only input port on left; keep port size default (16)
-            AddNode("JUMP IMPORT", Brushes.MediumPurple, 16, 70, 24, hasInput: true, hasOutput: false);
+            // Use same outer size/appearance as other nodes, but only input port on left
+            AddNode("JUMP EXPORT", Brushes.MediumPurple, 16, 140, 48, hasInput: true, hasOutput: false);
         }
 
         private void AddJumpExport_Click(object sender, RoutedEventArgs e)
         {
-            // smaller outer size (half) and only output port on right; keep port size default (16)
-            AddNode("JUMP EXPORT", Brushes.MediumPurple, 16, 70, 24, hasInput: false, hasOutput: true);
+            // Use same outer size/appearance as other nodes, but only output port on right
+            AddNode("JUMP IMPORT", Brushes.MediumPurple, 16, 140, 48, hasInput: false, hasOutput: true);
         }
 
         private void AddNode(string text, Brush color, double portSize = 16, double width = 140, double height = 48, bool hasInput = true, bool hasOutput = true)
