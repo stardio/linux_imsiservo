@@ -117,48 +117,63 @@ namespace EtherCAT_Studio
 
         private void AddMotionNode_Click(object sender, RoutedEventArgs e)
         {
-            AddNode("ABS MOVE", Brushes.CornflowerBlue);
+            AddNode("ABS MOVE", Brushes.CornflowerBlue, nodeType: "MOTION");
         }
 
         private void AddWaitNode_Click(object sender, RoutedEventArgs e)
         {
-            AddNode("WAIT", Brushes.Orange);
+            AddNode("WAIT", Brushes.Orange, nodeType: "WAIT");
         }
         private void AddSetDo_Click(object sender, RoutedEventArgs e)
         {
-            AddNode("SET DO", Brushes.LimeGreen);
+            AddNode("SET DO", Brushes.LimeGreen, nodeType: "SET_DO");
         }
 
         private void AddCheckDi_Click(object sender, RoutedEventArgs e)
         {
-            AddNode("CHECK DI", Brushes.Gold);
+            AddNode("CHECK DI", Brushes.Gold, nodeType: "CHECK_DI");
         }
 
         private void AddGoto_Click(object sender, RoutedEventArgs e)
         {
-            AddNode("GOTO", Brushes.IndianRed);
+            AddNode("GOTO", Brushes.IndianRed, nodeType: "GOTO");
         }
 
         private void AddJump_Click(object sender, RoutedEventArgs e)
         {
-            AddNode("JUMP", Brushes.MediumPurple);
+            AddNode("JUMP", Brushes.MediumPurple, nodeType: "JUMP");
         }
         private void AddJumpImport_Click(object sender, RoutedEventArgs e)
         {
             // Use same outer size/appearance as other nodes, but only input port on left
-            AddNode("JUMP EXPORT", Brushes.MediumPurple, 16, 140, 48, hasInput: true, hasOutput: false);
+            AddNode("JUMP EXPORT", Brushes.MediumPurple, 16, 140, 48, hasInput: true, hasOutput: false, nodeType: "JUMP_EXPORT");
         }
 
         private void AddJumpExport_Click(object sender, RoutedEventArgs e)
         {
             // Use same outer size/appearance as other nodes, but only output port on right
-            AddNode("JUMP IMPORT", Brushes.MediumPurple, 16, 140, 48, hasInput: false, hasOutput: true);
+            AddNode("JUMP IMPORT", Brushes.MediumPurple, 16, 140, 48, hasInput: false, hasOutput: true, nodeType: "JUMP_IMPORT");
+        }
+        private void AddStartNode_Click(object sender, RoutedEventArgs e)
+        {
+            // START node: only output port on right
+            AddNode("START", Brushes.LimeGreen, 16, 140, 48, hasInput: false, hasOutput: true, nodeType: "START");
         }
 
-        private void AddNode(string text, Brush color, double portSize = 16, double width = 140, double height = 48, bool hasInput = true, bool hasOutput = true)
+        private void AddEndNode_Click(object sender, RoutedEventArgs e)
+        {
+            // END node: only input port on left
+            AddNode("END", Brushes.Red, 16, 140, 48, hasInput: true, hasOutput: false, nodeType: "END");
+        }
+
+        private void AddLinearMoveNode_Click(object sender, RoutedEventArgs e)
+        {
+            AddNode("LINEAR MOVE", Brushes.Blue, 16, 140, 48, hasInput: true, hasOutput: true, "LINEAR_MOVE");
+        }
+        private void AddNode(string text, Brush color, double portSize = 16, double width = 140, double height = 48, bool hasInput = true, bool hasOutput = true, string nodeType = "")
         {
             // NodeControl 인스턴스 생성 (색상 전달)
-            var node = new NodeControl(text, color, this, portSize, width, height, hasInput, hasOutput);
+            var node = new NodeControl(text, color, this, portSize, width, height, hasInput, hasOutput, nodeType);
 
             // 캔버스에 임의의 위치(계단식)로 배치
             double offset = 20 + (MainCanvas.Children.Count * 20);
@@ -283,16 +298,43 @@ namespace EtherCAT_Studio
         {
             var steps = new List<object>();
             int idx = 1;
-            var nodes = new List<NodeControl>();
+            var allNodes = new List<NodeControl>();
             foreach (var child in MainCanvas.Children)
             {
                 if (child is NodeControl node)
-                    nodes.Add(node);
+                    allNodes.Add(node);
             }
-            if (nodes.Count == 0)
+            if (allNodes.Count == 0)
             {
                 MessageBox.Show("저장할 노드가 없습니다.");
                 return;
+            }
+
+            // Find START node and build sequence based on connections
+            var startNode = allNodes.FirstOrDefault(n => n.NodeType == "START");
+            var nodes = new List<NodeControl>();
+            if (startNode != null)
+            {
+                var current = startNode;
+                var visited = new HashSet<NodeControl>();
+                while (current != null && !visited.Contains(current))
+                {
+                    visited.Add(current);
+                    nodes.Add(current);
+                    // Find next node via output connection
+                    var nextConn = _connections.FirstOrDefault(c => c.From?.Node == current);
+                    current = nextConn?.To?.Node;
+                }
+                // Add any unconnected nodes at the end
+                foreach (var node in allNodes.Where(n => !visited.Contains(n)))
+                {
+                    nodes.Add(node);
+                }
+            }
+            else
+            {
+                // No START, use canvas order
+                nodes = allNodes;
             }
 
             for (int i = 0; i < nodes.Count; i++)
@@ -315,6 +357,8 @@ namespace EtherCAT_Studio
                     "JUMP" => "GOTO",
                     "JUMP IMPORT" => "GOTO",
                     "JUMP EXPORT" => "GOTO",
+                    "START" => "START",
+                    "END" => "END",
                     "SYSTEM" => "SYSTEM",
                     _ => type
                 };
@@ -355,6 +399,19 @@ namespace EtherCAT_Studio
                             {
                                 int delay = (int)GetPropDouble(root, "delay_ms", GetPropDouble(root, "delay", 0));
                                 paramsObj = new { delay_ms = delay };
+                            }
+                            else if (type == "LINEAR_MOVE")
+                            {
+                                var target = new { X = 0.0, Y = 0.0, Z = 0.0 };
+                                if (root.TryGetProperty("target", out var t))
+                                {
+                                    double x = GetPropDouble(t, "X", 0);
+                                    double y = GetPropDouble(t, "Y", 0);
+                                    double z = GetPropDouble(t, "Z", 0);
+                                    target = new { X = x, Y = y, Z = z };
+                                }
+                                double speed = GetPropDouble(root, "speed", 0);
+                                paramsObj = new { target, speed };
                             }
                             else
                             {
@@ -409,6 +466,177 @@ namespace EtherCAT_Studio
                 System.IO.File.WriteAllText(dlg.FileName, outJson);
                 MessageBox.Show("저장 완료: " + dlg.FileName);
             }
+        }
+
+        private void RunSequence_Click(object sender, RoutedEventArgs e)
+        {
+            // Generate sequence JSON in memory (similar to SaveJson_Click)
+            var steps = new List<object>();
+            int idx = 1;
+            var allNodes = new List<NodeControl>();
+            foreach (var child in MainCanvas.Children)
+            {
+                if (child is NodeControl node)
+                    allNodes.Add(node);
+            }
+            if (allNodes.Count == 0)
+            {
+                MessageBox.Show("No nodes to execute.");
+                return;
+            }
+
+            // Find START node and build sequence based on connections
+            var startNode = allNodes.FirstOrDefault(n => n.NodeType == "START");
+            var nodes = new List<NodeControl>();
+            if (startNode != null)
+            {
+                var current = startNode;
+                var visited = new HashSet<NodeControl>();
+                while (current != null && !visited.Contains(current))
+                {
+                    visited.Add(current);
+                    nodes.Add(current);
+                    // Find next node via output connection
+                    var nextConn = _connections.FirstOrDefault(c => c.From?.Node == current);
+                    current = nextConn?.To?.Node;
+                }
+                // Add any unconnected nodes at the end
+                foreach (var node in allNodes.Where(n => !visited.Contains(n)))
+                {
+                    nodes.Add(node);
+                }
+            }
+            else
+            {
+                // No START, use canvas order
+                nodes = allNodes;
+            }
+
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                var node = nodes[i];
+                string id = $"node_{idx:00}";
+                idx++;
+                string type = (node.NodeType ?? "").ToUpperInvariant();
+                type = type switch
+                {
+                    "MOTION" => "MOTION",
+                    "M" => "MOTION",
+                    "ABS MOVE" => "MOTION",
+                    "WAIT" => "WAIT",
+                    "IO" => "IO",
+                    "SET DO" => "IO",
+                    "CHECK DI" => "IO",
+                    "FLOW" => "FLOW",
+                    "GOTO" => "FLOW",
+                    "JUMP" => "GOTO",
+                    "JUMP IMPORT" => "GOTO",
+                    "JUMP EXPORT" => "GOTO",
+                    "START" => "START",
+                    "END" => "END",
+                    "LINEAR MOVE" => "LINEAR_MOVE",
+                    "SYSTEM" => "SYSTEM",
+                    _ => type
+                };
+
+                object paramsObj = new { };
+                if (!string.IsNullOrEmpty(node.JsonData))
+                {
+                    try
+                    {
+                        var doc = System.Text.Json.JsonDocument.Parse(node.JsonData);
+                        var root = doc.RootElement;
+
+                        static string GetPropString(System.Text.Json.JsonElement el, string name, string def)
+                        {
+                            if (!el.TryGetProperty(name, out var p)) return def;
+                            if (p.ValueKind == System.Text.Json.JsonValueKind.String)
+                                return p.GetString() ?? def;
+                            var raw = p.GetRawText();
+                            return string.IsNullOrWhiteSpace(raw) ? def : raw.Trim('"');
+                        }
+
+                        static double GetPropDouble(System.Text.Json.JsonElement el, string name, double def)
+                        {
+                            if (!el.TryGetProperty(name, out var p)) return def;
+                            if (p.ValueKind == System.Text.Json.JsonValueKind.Number && p.TryGetDouble(out var d)) return d;
+                            if (p.ValueKind == System.Text.Json.JsonValueKind.String && double.TryParse(p.GetString(), out var d2)) return d2;
+                            return def;
+                        }
+
+                        if (type == "MOTION")
+                        {
+                            string axis = GetPropString(root, "axis", "X");
+                            double speed = GetPropDouble(root, "speed", 0);
+                            double pos = GetPropDouble(root, "position", GetPropDouble(root, "pos", 0));
+                            paramsObj = new { axis, pos, speed };
+                        }
+                        else if (type == "LINEAR_MOVE")
+                        {
+                            var target = new { X = 0.0, Y = 0.0, Z = 0.0 };
+                            if (root.TryGetProperty("target", out var t))
+                            {
+                                double x = GetPropDouble(t, "X", 0);
+                                double y = GetPropDouble(t, "Y", 0);
+                                double z = GetPropDouble(t, "Z", 0);
+                                target = new { X = x, Y = y, Z = z };
+                            }
+                            double speed = GetPropDouble(root, "speed", 0);
+                            paramsObj = new { target, speed };
+                        }
+                        else
+                        {
+                            if (root.TryGetProperty("params", out var p))
+                            {
+                                paramsObj = System.Text.Json.JsonSerializer.Deserialize<object>(p.GetRawText()) ?? new { };
+                            }
+                        }
+                        // Handle jump/goto params
+                        if (type == "GOTO")
+                        {
+                            if (root.TryGetProperty("jump_target", out var jt) && jt.ValueKind == System.Text.Json.JsonValueKind.String)
+                            {
+                                paramsObj = new { label = jt.GetString() };
+                            }
+                            else if (root.TryGetProperty("label", out var lbl) && lbl.ValueKind == System.Text.Json.JsonValueKind.String)
+                            {
+                                paramsObj = new { label = lbl.GetString() };
+                            }
+                        }
+                    }
+                    catch { }
+                }
+
+                var step = new Dictionary<string, object?>
+                {
+                    ["id"] = id,
+                    ["type"] = type,
+                    ["params"] = paramsObj
+                };
+                steps.Add(step);
+            }
+
+            // Simulate execution: parse and log each step
+            Console.WriteLine("=== Sequence Execution Start (Simulation) ===");
+            foreach (var step in steps)
+            {
+                var dict = (Dictionary<string, object?>)step;
+                string type = (string)dict["type"];
+                var paramDict = dict["params"] as System.Collections.IEnumerable;
+                if (paramDict != null)
+                {
+                    var paramStr = string.Join(", ", paramDict.Cast<System.Collections.Generic.KeyValuePair<string, object?>>().Select(kv => $"{kv.Key}={kv.Value}"));
+                    Console.WriteLine($"[{type}] {paramStr}");
+                }
+                else
+                {
+                    Console.WriteLine($"[{type}] Executing");
+                }
+                // Simulate delay for realism
+                System.Threading.Thread.Sleep(500);
+            }
+            Console.WriteLine("=== Sequence Execution Complete ===");
+            MessageBox.Show("Sequence execution complete (check console log)");
         }
     }
 }

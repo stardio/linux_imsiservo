@@ -37,9 +37,10 @@ namespace EtherCAT_Studio
 
         public string? JsonData { get; set; } // 노드별 JSON 데이터 저장
 
-        public NodeControl(string text, Brush color, MainWindow main, double portSize = 16, double width = 140, double height = 48, bool hasInput = true, bool hasOutput = true)
+        public NodeControl(string text, Brush color, MainWindow main, double portSize = 16, double width = 140, double height = 48, bool hasInput = true, bool hasOutput = true, string nodeType = "")
         {
             Main = main;
+            NodeType = nodeType;
             Width = width; Height = height;
 
             // 배경
@@ -115,8 +116,7 @@ namespace EtherCAT_Studio
             SetTop(contentGrid, 0);
             Children.Add(contentGrid);
 
-            // 노드 타입
-            NodeType = text;
+            // 노드 타입 (`nodeType` parameter set earlier) - do not overwrite with display text
 
             // 포트 정보
             InputPortInfo = new MainWindow.PortInfo { Type = MainWindow.PortType.Input, Node = this, Ellipse = InputPort };
@@ -156,7 +156,18 @@ namespace EtherCAT_Studio
         {
             if (e.ClickCount == 2)
             {
-                var win = new PropertyWindow(JsonData);
+                // Log NodeType before opening PropertyWindow
+                try
+                {
+                    var dir = System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "EtherCAT_Studio");
+                    System.IO.Directory.CreateDirectory(dir);
+                    string logFilePath = System.IO.Path.Combine(dir, "debug_log.txt");
+                    System.IO.File.AppendAllText(logFilePath, $"NodeControl double-click nodeType: {NodeType}\n");
+                    System.Diagnostics.Debug.WriteLine($"NodeControl double-click nodeType: {NodeType}");
+                }
+                catch { }
+
+                var win = new PropertyWindow(JsonData, NodeType);
                 if (win.ShowDialog() == true && !string.IsNullOrEmpty(win.JsonResult))
                 {
                         JsonData = win.JsonResult;

@@ -61,6 +61,8 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -70,35 +72,9 @@
         <TextBlock Text="Jump Target" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
         <TextBox x:Name="JumpTargetBox" Grid.Row="1" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White"/>
 
-        <TextBlock Text="Axis" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
-        <ComboBox x:Name="AxisBox" Grid.Row="2" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White" Style="{StaticResource DarkComboBoxStyle}">
-            <ComboBox.ItemContainerStyle>
-                <Style TargetType="ComboBoxItem">
-                    <Setter Property="Background" Value="#000" />
-                    <Setter Property="Foreground" Value="White" />
-                    <Style.Triggers>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background" Value="#000" />
-                            <Setter Property="Foreground" Value="White" />
-                        </Trigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#111" />
-                            <Setter Property="Foreground" Value="White" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </ComboBox.ItemContainerStyle>
-            <ComboBoxItem Content="X" />
-            <ComboBoxItem Content="Y" />
-            <ComboBoxItem Content="Z" />
-        </ComboBox>
-        <TextBlock Text="Position" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
-        <TextBox x:Name="PositionBox" Grid.Row="3" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White"/>
-        <TextBlock Text="Speed" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
-        <TextBox x:Name="SpeedBox" Grid.Row="4" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White"/>
-        <TextBlock Text="Description" Grid.Row="5" Grid.Column="0" Margin="0,4,0,0"/>
-        <TextBox x:Name="DescriptionBox" Grid.Row="5" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White" AcceptsReturn="True"/>
-        <StackPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+        <ContentControl x:Name="NodeSpecificContent" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="8"/>
+
+        <StackPanel Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
             <Button Content="확인" Width="80" Margin="0,0,8,0" Click="Ok_Click" Background="#0078D7" Foreground="White"/>
             <Button Content="취소" Width="80" Click="Cancel_Click" Background="#444" Foreground="White"/>
         </StackPanel>
