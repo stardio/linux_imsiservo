@@ -3,18 +3,21 @@ using System.Windows.Controls;
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace EtherCAT_Studio
 {
     public partial class PropertyWindow : Window
     {
         public string? JsonResult { get; private set; }
-        private string _nodeType;
+        private string _nodeType = string.Empty;
+        private string _nodeLabel = string.Empty;
 
-        public PropertyWindow(string? initialJson = null, string nodeType = "")
+        public PropertyWindow(string? initialJson = null, string nodeType = "", string nodeLabel = "")
         {
             InitializeComponent();
             _nodeType = nodeType;
+            _nodeLabel = nodeLabel ?? string.Empty;
             System.Diagnostics.Debug.WriteLine($"PropertyWindow initialized with nodeType: {_nodeType}");
             // Log nodeType to a file for debugging (use LocalApplicationData for writable location)
             try
@@ -31,13 +34,23 @@ namespace EtherCAT_Studio
             }
 
             // node-specific control will be created below and initialized from JSON if provided
-            // host appropriate control
-            UserControl nodeControl = (_nodeType ?? "").ToUpperInvariant() switch
+            // host appropriate control. For a MOTION node with label "ABS MOVE" use the specialized AbsMoveControl
+            UserControl nodeControl;
+            if ("MOTION".Equals(_nodeType, System.StringComparison.OrdinalIgnoreCase)
+                && "ABS MOVE".Equals(_nodeLabel, System.StringComparison.OrdinalIgnoreCase))
             {
-                "LINEAR_MOVE" => new LinearMoveControl(),
-                "MOTION" => new MotionControl(),
-                _ => new GenericControl()
-            };
+                nodeControl = new AbsMoveControl();
+            }
+            else
+            {
+                nodeControl = (_nodeType ?? "").ToUpperInvariant() switch
+                {
+                    "LINEAR_MOVE" => new LinearMoveControl(),
+                    "MOTION" => new MotionControl(),
+                    "WAIT" => new WaitControl(),
+                    _ => new GenericControl()
+                };
+            }
             NodeSpecificContent.Content = nodeControl;
 
             // Debug log which control was loaded for which nodeType
@@ -56,11 +69,29 @@ namespace EtherCAT_Studio
                 System.Diagnostics.Debug.WriteLine($"Failed to write debug log (load control): {ex.Message}");
             }
 
-            // If we have initial JSON, pass full root to control's Load
+            // If we have initial JSON, and this is an ABS MOVE, remove unwanted keys then pass root to control's Load
             if (!string.IsNullOrEmpty(initialJson))
             {
                 try
                 {
+                    bool isAbsMove = ("MOTION".Equals(_nodeType, System.StringComparison.OrdinalIgnoreCase)
+                        && "ABS MOVE".Equals(_nodeLabel, System.StringComparison.OrdinalIgnoreCase));
+                    if (isAbsMove)
+                    {
+                        try
+                        {
+                            var node = JsonNode.Parse(initialJson) as JsonObject;
+                            if (node != null)
+                            {
+                                node.Remove("speed_history");
+                                node.Remove("description");
+                                // replace initialJson with cleaned JSON for loading
+                                initialJson = node.ToJsonString();
+                            }
+                        }
+                        catch { }
+                    }
+
                     var doc = System.Text.Json.JsonDocument.Parse(initialJson);
                     var root = doc.RootElement;
                     // call Load if available
@@ -71,6 +102,9 @@ namespace EtherCAT_Studio
                             break;
                         case MotionControl mc2:
                             mc2.Load(root);
+                            break;
+                        case AbsMoveControl amc:
+                            amc.Load(root);
                             break;
                         case GenericControl gc:
                             gc.Load(root);
@@ -85,9 +119,10 @@ namespace EtherCAT_Studio
         {
             var obj = new Dictionary<string, object>();
             string label = LabelBox.Text ?? string.Empty;
-            string jumpTarget = JumpTargetBox.Text ?? string.Empty;
+            bool isAbsMove = ("MOTION".Equals(_nodeType, System.StringComparison.OrdinalIgnoreCase)
+                && "ABS MOVE".Equals(_nodeLabel, System.StringComparison.OrdinalIgnoreCase));
+            // Include label normally; for ABS MOVE we'll also emit the label inside the ABS JSON
             if (!string.IsNullOrWhiteSpace(label)) obj["label"] = label;
-            if (!string.IsNullOrWhiteSpace(jumpTarget)) obj["jump_target"] = jumpTarget;
             // collect node-specific parameters from the hosted control
             var hosted = NodeSpecificContent.Content;
             if (hosted is LinearMoveControl lmc)
@@ -98,11 +133,34 @@ namespace EtherCAT_Studio
             {
                 foreach (var kv in mc.Collect()) obj[kv.Key] = kv.Value;
             }
+            else if (hosted is AbsMoveControl amc)
+            {
+                foreach (var kv in amc.Collect()) obj[kv.Key] = kv.Value;
+            }
             else if (hosted is GenericControl gc)
             {
                 foreach (var kv in gc.Collect()) obj[kv.Key] = kv.Value;
             }
-            JsonResult = System.Text.Json.JsonSerializer.Serialize(obj, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+            // If this is an ABS MOVE node, shape the JSON to only include the four requested fields
+            if (isAbsMove && NodeSpecificContent.Content is MotionControl)
+            {
+                var abs = new Dictionary<string, object>();
+                abs["type"] = "ABS MOVE";
+                // axis
+                if (obj.TryGetValue("axis", out var axis)) abs["axis"] = axis ?? "X";
+                // position may be present under either `target_position` (new) or `position` (legacy)
+                if (obj.TryGetValue("target_position", out var tpos)) abs["position"] = tpos!;
+                else if (obj.TryGetValue("position", out var position)) abs["position"] = position!;
+                // speed
+                if (obj.TryGetValue("speed", out var speed)) abs["speed"] = speed!;
+                // include label/comment inside ABS MOVE JSON if present
+                if (obj.TryGetValue("label", out var lbl)) abs["label"] = lbl!;
+                JsonResult = System.Text.Json.JsonSerializer.Serialize(abs, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+            }
+            else
+            {
+                JsonResult = System.Text.Json.JsonSerializer.Serialize(obj, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+            }
             DialogResult = true;
             Close();
         }

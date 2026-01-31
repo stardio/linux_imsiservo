@@ -392,7 +392,7 @@ namespace EtherCAT_Studio
                             {
                                 string axis = GetPropString(root, "axis", "X");
                                 double speed = GetPropDouble(root, "speed", 0);
-                                double pos = GetPropDouble(root, "position", GetPropDouble(root, "pos", 0));
+                                double pos = GetPropDouble(root, "target_position", GetPropDouble(root, "position", GetPropDouble(root, "pos", 0)));
                                 paramsObj = new { axis, pos, speed };
                             }
                             else if (type == "WAIT")
@@ -436,7 +436,7 @@ namespace EtherCAT_Studio
                         catch { }
                 }
 
-                string next = (i < nodes.Count - 1) ? $"node_{(i + 2):00}" : null;
+                string? next = (i < nodes.Count - 1) ? $"node_{(i + 2):00}" : null;
                 var step = new Dictionary<string, object?>
                 {
                     ["id"] = id,
@@ -567,8 +567,8 @@ namespace EtherCAT_Studio
                         if (type == "MOTION")
                         {
                             string axis = GetPropString(root, "axis", "X");
-                            double speed = GetPropDouble(root, "speed", 0);
-                            double pos = GetPropDouble(root, "position", GetPropDouble(root, "pos", 0));
+                                double speed = GetPropDouble(root, "speed", 0);
+                                double pos = GetPropDouble(root, "target_position", GetPropDouble(root, "position", GetPropDouble(root, "pos", 0)));
                             paramsObj = new { axis, pos, speed };
                         }
                         else if (type == "LINEAR_MOVE")
@@ -621,7 +621,7 @@ namespace EtherCAT_Studio
             foreach (var step in steps)
             {
                 var dict = (Dictionary<string, object?>)step;
-                string type = (string)dict["type"];
+                string type = dict.ContainsKey("type") ? dict["type"] as string ?? string.Empty : string.Empty;
                 var paramDict = dict["params"] as System.Collections.IEnumerable;
                 if (paramDict != null)
                 {

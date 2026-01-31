@@ -167,7 +167,7 @@ namespace EtherCAT_Studio
                 }
                 catch { }
 
-                var win = new PropertyWindow(JsonData, NodeType);
+                var win = new PropertyWindow(JsonData, NodeType, Label.Text);
                 if (win.ShowDialog() == true && !string.IsNullOrEmpty(win.JsonResult))
                 {
                         JsonData = win.JsonResult;

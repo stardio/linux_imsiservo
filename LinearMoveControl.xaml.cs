@@ -16,11 +16,24 @@ namespace EtherCAT_Studio
             if (root == null) return;
             if (root.Value.TryGetProperty("target", out var t) && t.ValueKind == JsonValueKind.Object)
             {
-                if (t.TryGetProperty("X", out var tx)) TargetXBox.Text = tx.GetRawText();
-                if (t.TryGetProperty("Y", out var ty)) TargetYBox.Text = ty.GetRawText();
-                if (t.TryGetProperty("Z", out var tz)) TargetZBox.Text = tz.GetRawText();
+                // handle either numeric fields or object-with-value
+                if (t.TryGetProperty("X", out var tx))
+                {
+                    TargetXBox.Text = tx.ValueKind == JsonValueKind.Object && tx.TryGetProperty("value", out var vtx) ? vtx.GetRawText() : tx.GetRawText();
+                }
+                if (t.TryGetProperty("Y", out var ty))
+                {
+                    TargetYBox.Text = ty.ValueKind == JsonValueKind.Object && ty.TryGetProperty("value", out var vty) ? vty.GetRawText() : ty.GetRawText();
+                }
+                if (t.TryGetProperty("Z", out var tz))
+                {
+                    TargetZBox.Text = tz.ValueKind == JsonValueKind.Object && tz.TryGetProperty("value", out var vtz) ? vtz.GetRawText() : tz.GetRawText();
+                }
             }
-            if (root.Value.TryGetProperty("speed", out var s)) LinearSpeedBox.Text = s.GetRawText();
+            if (root.Value.TryGetProperty("speed", out var s))
+            {
+                LinearSpeedBox.Text = s.ValueKind == JsonValueKind.Object && s.TryGetProperty("value", out var vs) ? vs.GetRawText() : s.GetRawText();
+            }
         }
 
         public Dictionary<string, object> Collect()
@@ -32,8 +45,8 @@ namespace EtherCAT_Studio
             double.TryParse(LinearSpeedBox.Text, out speed);
             return new Dictionary<string, object>
             {
-                ["target"] = new { X = tx, Y = ty, Z = tz },
-                ["speed"] = speed
+                ["target"] = new Dictionary<string, object> { ["X"] = new { value = tx, unit = "Puls" }, ["Y"] = new { value = ty, unit = "Puls" }, ["Z"] = new { value = tz, unit = "Puls" } },
+                ["speed"] = new { value = speed, unit = "Puls" }
             };
         }
     }

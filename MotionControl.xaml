@@ -7,7 +7,7 @@
              Height="220" HorizontalAlignment="Stretch">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="80"/>
+            <ColumnDefinition Width="120"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -22,11 +22,13 @@
             <ComboBoxItem Content="Y" />
             <ComboBoxItem Content="Z" />
         </ComboBox>
-        <TextBlock Text="Position" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
-        <TextBox x:Name="PositionBox" Grid.Row="1" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White"/>
-        <TextBlock Text="Speed" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
-        <TextBox x:Name="SpeedBox" Grid.Row="2" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White"/>
-        <TextBlock Text="Description" Grid.Row="3" Grid.Column="0" VerticalAlignment="Top" Margin="0,4,0,0"/>
-        <TextBox x:Name="DescriptionBox" Grid.Row="3" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White" AcceptsReturn="True"/>
+        <TextBlock Text="Speed History (Puls)" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
+        <ComboBox x:Name="SpeedHistoryBox" Grid.Row="1" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White" IsEditable="True"/>
+        <TextBlock Text="Position (Puls)" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
+        <TextBox x:Name="PositionBox" Grid.Row="2" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White"/>
+        <TextBlock Text="Speed (Puls)" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
+        <TextBox x:Name="SpeedBox" Grid.Row="3" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White"/>
+        <TextBlock Text="Description" Grid.Row="4" Grid.Column="0" VerticalAlignment="Top" Margin="0,4,0,0"/>
+        <TextBox x:Name="DescriptionBox" Grid.Row="4" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White" AcceptsReturn="True"/>
     </Grid>
 </UserControl>

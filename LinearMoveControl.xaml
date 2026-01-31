@@ -7,7 +7,7 @@
              Height="220" HorizontalAlignment="Stretch">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="80"/>
+            <ColumnDefinition Width="120"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -16,13 +16,13 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TextBlock Text="Target X" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
+        <TextBlock Text="Target X (Puls)" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
         <TextBox x:Name="TargetXBox" Grid.Row="0" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White"/>
-        <TextBlock Text="Target Y" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
+        <TextBlock Text="Target Y (Puls)" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
         <TextBox x:Name="TargetYBox" Grid.Row="1" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White"/>
-        <TextBlock Text="Target Z" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
+        <TextBlock Text="Target Z (Puls)" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
         <TextBox x:Name="TargetZBox" Grid.Row="2" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White"/>
-        <TextBlock Text="Speed" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
+        <TextBlock Text="Speed (Puls)" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
         <TextBox x:Name="LinearSpeedBox" Grid.Row="3" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White"/>
     </Grid>
 </UserControl>
