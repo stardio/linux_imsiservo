@@ -1,0 +1,13 @@
+{
+  "sequence_name": "Sequence",
+  "steps": [
+    {
+      "id": "node_01",
+      "type": "WAIT",
+      "params": {
+        "delay_ms": 3333
+      },
+      "next": null
+    }
+  ]
+}

@@ -46,8 +46,12 @@ namespace EtherCAT_Studio
                 nodeControl = (_nodeType ?? "").ToUpperInvariant() switch
                 {
                     "LINEAR_MOVE" => new LinearMoveControl(),
-                    "MOTION" => new MotionControl(),
+                    "REL_MOVE" => new RelMoveControl(),
+                    "CIRCULAR_MOVE" => new CircularMoveControl(),
                     "WAIT" => new WaitControl(),
+                    "COUNTER" => new CounterControl(),
+                    "GOTO" => new GotoControl(),
+                    "JUMP" => new GotoControl(),
                     _ => new GenericControl()
                 };
             }
@@ -72,6 +76,15 @@ namespace EtherCAT_Studio
             // If we have initial JSON, and this is an ABS MOVE, remove unwanted keys then pass root to control's Load
             if (!string.IsNullOrEmpty(initialJson))
             {
+                // Log initial JSON being loaded
+                try
+                {
+                    var dir = System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "EtherCAT_Studio");
+                    System.IO.Directory.CreateDirectory(dir);
+                    string logFilePath = System.IO.Path.Combine(dir, "debug_log.txt");
+                    System.IO.File.AppendAllText(logFilePath, $"Loading initialJson for {_nodeType} ({_nodeLabel}): {initialJson}\n");
+                }
+                catch { }
                 try
                 {
                     bool isAbsMove = ("MOTION".Equals(_nodeType, System.StringComparison.OrdinalIgnoreCase)
@@ -94,20 +107,53 @@ namespace EtherCAT_Studio
 
                     var doc = System.Text.Json.JsonDocument.Parse(initialJson);
                     var root = doc.RootElement;
+                    // populate common fields (label, comment) so they persist
+                    try
+                    {
+                        if (root.TryGetProperty("label", out var lbl) && lbl.ValueKind == System.Text.Json.JsonValueKind.String)
+                        {
+                            LabelBox.Text = lbl.GetString() ?? string.Empty;
+                        }
+                        else if (root.TryGetProperty("name", out var namep) && namep.ValueKind == System.Text.Json.JsonValueKind.String)
+                        {
+                            LabelBox.Text = namep.GetString() ?? string.Empty;
+                        }
+                        if (root.TryGetProperty("jump_target", out var jt) && jt.ValueKind == System.Text.Json.JsonValueKind.String)
+                        {
+                            JumpTargetBox.Text = jt.GetString() ?? string.Empty;
+                        }
+                        else if (root.TryGetProperty("comment", out var com) && com.ValueKind == System.Text.Json.JsonValueKind.String)
+                        {
+                            JumpTargetBox.Text = com.GetString() ?? string.Empty;
+                        }
+                    }
+                    catch { }
                     // call Load if available
                     switch (nodeControl)
                     {
                         case LinearMoveControl lmc:
                             lmc.Load(root);
                             break;
-                        case MotionControl mc2:
-                            mc2.Load(root);
+                        case RelMoveControl rmc:
+                            rmc.Load(root);
+                            break;
+                        case CircularMoveControl cmc:
+                            cmc.Load(root);
                             break;
                         case AbsMoveControl amc:
                             amc.Load(root);
                             break;
-                        case GenericControl gc:
+                        case WaitControl wc:
+                            wc.Load(root);
+                            break;
+                        case CounterControl cc:
+                            cc.Load(root);
+                            break;
+                        case GotoControl gc:
                             gc.Load(root);
+                            break;
+                        case GenericControl gn:
+                            gn.Load(root);
                             break;
                     }
                 }
@@ -119,30 +165,48 @@ namespace EtherCAT_Studio
         {
             var obj = new Dictionary<string, object>();
             string label = LabelBox.Text ?? string.Empty;
+            string comment = JumpTargetBox.Text ?? string.Empty;
             bool isAbsMove = ("MOTION".Equals(_nodeType, System.StringComparison.OrdinalIgnoreCase)
                 && "ABS MOVE".Equals(_nodeLabel, System.StringComparison.OrdinalIgnoreCase));
             // Include label normally; for ABS MOVE we'll also emit the label inside the ABS JSON
             if (!string.IsNullOrWhiteSpace(label)) obj["label"] = label;
+            if (!string.IsNullOrWhiteSpace(comment)) obj["comment"] = comment;
             // collect node-specific parameters from the hosted control
             var hosted = NodeSpecificContent.Content;
             if (hosted is LinearMoveControl lmc)
             {
                 foreach (var kv in lmc.Collect()) obj[kv.Key] = kv.Value;
             }
-            else if (hosted is MotionControl mc)
+            else if (hosted is RelMoveControl rmc)
             {
-                foreach (var kv in mc.Collect()) obj[kv.Key] = kv.Value;
+                foreach (var kv in rmc.Collect()) obj[kv.Key] = kv.Value;
+            }
+            else if (hosted is CircularMoveControl cmc)
+            {
+                foreach (var kv in cmc.Collect()) obj[kv.Key] = kv.Value;
             }
             else if (hosted is AbsMoveControl amc)
             {
                 foreach (var kv in amc.Collect()) obj[kv.Key] = kv.Value;
             }
-            else if (hosted is GenericControl gc)
+            else if (hosted is WaitControl wc)
             {
-                foreach (var kv in gc.Collect()) obj[kv.Key] = kv.Value;
+                foreach (var kv in wc.Collect()) obj[kv.Key] = kv.Value;
+            }
+            else if (hosted is CounterControl cc)
+            {
+                foreach (var kv in cc.Collect()) obj[kv.Key] = kv.Value;
+            }
+            else if (hosted is GotoControl gotoc)
+            {
+                foreach (var kv in gotoc.Collect()) obj[kv.Key] = kv.Value;
+            }
+            else if (hosted is GenericControl gc2)
+            {
+                foreach (var kv in gc2.Collect()) obj[kv.Key] = kv.Value;
             }
             // If this is an ABS MOVE node, shape the JSON to only include the four requested fields
-            if (isAbsMove && NodeSpecificContent.Content is MotionControl)
+            if (isAbsMove && NodeSpecificContent.Content is AbsMoveControl)
             {
                 var abs = new Dictionary<string, object>();
                 abs["type"] = "ABS MOVE";
@@ -155,6 +219,7 @@ namespace EtherCAT_Studio
                 if (obj.TryGetValue("speed", out var speed)) abs["speed"] = speed!;
                 // include label/comment inside ABS MOVE JSON if present
                 if (obj.TryGetValue("label", out var lbl)) abs["label"] = lbl!;
+                if (obj.TryGetValue("comment", out var cmt)) abs["comment"] = cmt!;
                 JsonResult = System.Text.Json.JsonSerializer.Serialize(abs, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
             }
             else

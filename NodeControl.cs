@@ -34,6 +34,7 @@ namespace EtherCAT_Studio
         public MainWindow.PortInfo InputPortInfo { get; }
         public MainWindow.PortInfo OutputPortInfo { get; }
         public string NodeType { get; }
+        public string OriginalLabel { get; } // 노드 타입 식별용 원래 라벨
 
         public string? JsonData { get; set; } // 노드별 JSON 데이터 저장
 
@@ -41,6 +42,7 @@ namespace EtherCAT_Studio
         {
             Main = main;
             NodeType = nodeType;
+            OriginalLabel = text; // 원래 라벨 저장
             Width = width; Height = height;
 
             // 배경
@@ -167,10 +169,19 @@ namespace EtherCAT_Studio
                 }
                 catch { }
 
-                var win = new PropertyWindow(JsonData, NodeType, Label.Text);
+                var win = new PropertyWindow(JsonData, NodeType, OriginalLabel);
                 if (win.ShowDialog() == true && !string.IsNullOrEmpty(win.JsonResult))
                 {
                         JsonData = win.JsonResult;
+                        // Log saved JsonData
+                        try
+                        {
+                            var dir = System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "EtherCAT_Studio");
+                            System.IO.Directory.CreateDirectory(dir);
+                            string logFilePath = System.IO.Path.Combine(dir, "debug_log.txt");
+                            System.IO.File.AppendAllText(logFilePath, $"Saved JsonData for {NodeType}: {JsonData}\n");
+                        }
+                        catch { }
                         try
                         {
                             var doc = System.Text.Json.JsonDocument.Parse(JsonData);

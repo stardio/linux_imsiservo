@@ -1,0 +1,35 @@
+{
+  "nodes": [
+    {
+      "nodeType": "MOTION",
+      "originalLabel": "ABS MOVE",
+      "x": 219.33333333333331,
+      "y": 166,
+      "jsonData": "{\r\n  \u0022type\u0022: \u0022ABS MOVE\u0022,\r\n  \u0022axis\u0022: \u0022Y\u0022,\r\n  \u0022position\u0022: {\r\n    \u0022value\u0022: 1000,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  },\r\n  \u0022speed\u0022: {\r\n    \u0022value\u0022: 2000,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  },\r\n  \u0022label\u0022: \u0022axis1\u0022,\r\n  \u0022comment\u0022: \u0022aa\u0022\r\n}"
+    },
+    {
+      "nodeType": "START",
+      "originalLabel": "START",
+      "x": 23.333333333333314,
+      "y": 105.33333333333334,
+      "jsonData": "{\r\n  \u0022label\u0022: \u0022start\u0022,\r\n  \u0022comment\u0022: \u0022ss\u0022\r\n}"
+    },
+    {
+      "nodeType": "END",
+      "originalLabel": "END",
+      "x": 433.33333333333337,
+      "y": 257.33333333333337,
+      "jsonData": "{\r\n  \u0022label\u0022: \u0022end\u0022,\r\n  \u0022comment\u0022: \u00222\u0022\r\n}"
+    }
+  ],
+  "connections": [
+    {
+      "fromNodeIndex": 1,
+      "toNodeIndex": 0
+    },
+    {
+      "fromNodeIndex": 0,
+      "toNodeIndex": 2
+    }
+  ]
+}

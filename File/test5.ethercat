@@ -1,0 +1,123 @@
+{
+  "nodes": [
+    {
+      "nodeType": "REL_MOVE",
+      "originalLabel": "REL MOVE",
+      "x": 30,
+      "y": 59.333333333333336,
+      "jsonData": null
+    },
+    {
+      "nodeType": "REL_MOVE",
+      "originalLabel": "REL MOVE",
+      "x": 1234,
+      "y": 241.33333333333331,
+      "jsonData": null
+    },
+    {
+      "nodeType": "REL_MOVE",
+      "originalLabel": "REL MOVE",
+      "x": 328.66666666666663,
+      "y": 304,
+      "jsonData": null
+    },
+    {
+      "nodeType": "REL_MOVE",
+      "originalLabel": "REL MOVE",
+      "x": 1418.6666666666667,
+      "y": 310,
+      "jsonData": null
+    },
+    {
+      "nodeType": "LINEAR_MOVE",
+      "originalLabel": "LINEAR MOVE",
+      "x": 686.6666666666666,
+      "y": 204.66666666666669,
+      "jsonData": null
+    },
+    {
+      "nodeType": "CIRCULAR_MOVE",
+      "originalLabel": "CIRCULAR MOVE",
+      "x": 511.3333333333333,
+      "y": 252.66666666666674,
+      "jsonData": null
+    },
+    {
+      "nodeType": "WAIT",
+      "originalLabel": "WAIT",
+      "x": 853.9999999999998,
+      "y": 274,
+      "jsonData": null
+    },
+    {
+      "nodeType": "COUNTER",
+      "originalLabel": "COUNTER",
+      "x": 1022.6666666666665,
+      "y": 216,
+      "jsonData": null
+    },
+    {
+      "nodeType": "CIRCULAR_MOVE",
+      "originalLabel": "CIRCULAR MOVE",
+      "x": 180,
+      "y": 180,
+      "jsonData": null
+    },
+    {
+      "nodeType": "START",
+      "originalLabel": "START",
+      "x": 9.333333333333314,
+      "y": 350.6666666666667,
+      "jsonData": null
+    },
+    {
+      "nodeType": "END",
+      "originalLabel": "END",
+      "x": 1575.3333333333333,
+      "y": 414,
+      "jsonData": null
+    }
+  ],
+  "connections": [
+    {
+      "fromNodeIndex": 1,
+      "toNodeIndex": 3
+    },
+    {
+      "fromNodeIndex": 7,
+      "toNodeIndex": 1
+    },
+    {
+      "fromNodeIndex": 6,
+      "toNodeIndex": 7
+    },
+    {
+      "fromNodeIndex": 5,
+      "toNodeIndex": 4
+    },
+    {
+      "fromNodeIndex": 4,
+      "toNodeIndex": 6
+    },
+    {
+      "fromNodeIndex": 2,
+      "toNodeIndex": 5
+    },
+    {
+      "fromNodeIndex": 8,
+      "toNodeIndex": 2
+    },
+    {
+      "fromNodeIndex": 0,
+      "toNodeIndex": 8
+    },
+    {
+      "fromNodeIndex": 9,
+      "toNodeIndex": 0
+    },
+    {
+      "fromNodeIndex": 3,
+      "toNodeIndex": 10
+    }
+  ]
+}

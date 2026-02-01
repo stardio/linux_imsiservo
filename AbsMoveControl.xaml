@@ -5,6 +5,45 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              Height="160" HorizontalAlignment="Stretch">
+    <UserControl.Resources>
+        <Style x:Key="DarkComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="#000" />
+            <Setter Property="BorderBrush" Value="#444" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton Name="ToggleButton"
+                                          Grid.Column="2"
+                                          Focusable="False"
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                          Foreground="{TemplateBinding Foreground}">
+                                <Grid>
+                                    <ContentPresenter Name="ContentSite"
+                                                      Content="{TemplateBinding SelectionBoxItem}"
+                                                      ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                      Margin="6,0,25,0"
+                                                      VerticalAlignment="Center"/>
+                                    <Path HorizontalAlignment="Right" Margin="0,0,6,0" VerticalAlignment="Center" Data="M 0 0 L 4 4 L 8 0 Z" Fill="White"/>
+                                </Grid>
+                            </ToggleButton>
+                            <Popup Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Slide">
+                                <Border Name="DropDownBorder" Background="#000" BorderBrush="#444" BorderThickness="1">
+                                    <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" Background="#000"/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="120"/>
@@ -16,7 +55,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <TextBlock Text="Axis" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,0,4"/>
-        <ComboBox x:Name="AxisBox" Grid.Row="0" Grid.Column="1" Margin="0,0,0,4" Background="#000" Foreground="White">
+        <ComboBox x:Name="AxisBox" Grid.Row="0" Grid.Column="1" Margin="0,0,0,4" Style="{StaticResource DarkComboBoxStyle}">
             <ComboBoxItem Content="X" />
             <ComboBoxItem Content="Y" />
             <ComboBoxItem Content="Z" />
