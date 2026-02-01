@@ -1,0 +1,21 @@
+1) JSON 스펙 고정
+- sequence_schema.json로 타입/필드 고정
+- sequence_example.json로 샘플 제공
+
+2) Linux 실행 파이프라인
+- GUI가 JSON 저장
+- Linux 서비스가 JSON 로드 및 실행
+- 통신: file-watch 또는 REST/IPC
+
+3) UI 이식 전략
+- WPF 대신 Avalonia 또는 웹 UI
+- 노드 편집/연결/저장 기능만 1차 구현
+
+4) C++ 어댑터(LS_SERVO_Controller)
+- JSON 파서 추가
+- 각 step type을 ServoController 명령으로 변환
+- 시뮬레이션 모드 포함
+
+5) 검증
+- sample sequence로 시뮬레이션 실행
+- 실제 EtherCAT 연결 테스트

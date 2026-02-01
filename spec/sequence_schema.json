@@ -1,0 +1,146 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "EtherCAT Studio Sequence",
+  "type": "object",
+  "required": ["sequence_name", "steps"],
+  "properties": {
+    "sequence_name": { "type": "string" },
+    "steps": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/step" }
+    }
+  },
+  "definitions": {
+    "step": {
+      "type": "object",
+      "required": ["id", "type", "params", "next"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^node_\\d{2}$" },
+        "type": {
+          "type": "string",
+          "enum": [
+            "MOTION",
+            "WAIT",
+            "IO",
+            "FLOW",
+            "START",
+            "END",
+            "LINEAR_MOVE",
+            "REL_MOVE",
+            "CIRCULAR_MOVE",
+            "COUNTER",
+            "SYSTEM"
+          ]
+        },
+        "params": {
+          "type": "object",
+          "oneOf": [
+            { "$ref": "#/definitions/motionParams" },
+            { "$ref": "#/definitions/waitParams" },
+            { "$ref": "#/definitions/linearMoveParams" },
+            { "$ref": "#/definitions/relMoveParams" },
+            { "$ref": "#/definitions/circularMoveParams" },
+            { "$ref": "#/definitions/counterParams" },
+            { "$ref": "#/definitions/gotoParams" },
+            { "type": "object", "additionalProperties": true }
+          ]
+        },
+        "next": { "type": ["string", "null"], "pattern": "^node_\\d{2}$" }
+      },
+      "additionalProperties": false
+    },
+    "motionParams": {
+      "type": "object",
+      "required": ["axis", "pos", "speed"],
+      "properties": {
+        "axis": { "type": "string" },
+        "pos": { "type": "number" },
+        "speed": { "type": "number" }
+      },
+      "additionalProperties": true
+    },
+    "waitParams": {
+      "type": "object",
+      "required": ["delay_ms"],
+      "properties": {
+        "delay_ms": { "type": "integer" }
+      },
+      "additionalProperties": true
+    },
+    "linearMoveParams": {
+      "type": "object",
+      "required": ["target", "speed"],
+      "properties": {
+        "target": {
+          "type": "object",
+          "required": ["X", "Y", "Z"],
+          "properties": {
+            "X": { "type": "number" },
+            "Y": { "type": "number" },
+            "Z": { "type": "number" }
+          },
+          "additionalProperties": false
+        },
+        "speed": { "type": "number" }
+      },
+      "additionalProperties": true
+    },
+    "relMoveParams": {
+      "type": "object",
+      "required": ["axis", "distance", "speed"],
+      "properties": {
+        "axis": { "type": "string" },
+        "distance": { "type": "number" },
+        "speed": { "type": "number" }
+      },
+      "additionalProperties": true
+    },
+    "circularMoveParams": {
+      "type": "object",
+      "required": ["center", "end", "direction"],
+      "properties": {
+        "center": {
+          "type": "object",
+          "required": ["X", "Y"],
+          "properties": {
+            "X": { "type": "number" },
+            "Y": { "type": "number" }
+          },
+          "additionalProperties": false
+        },
+        "end": {
+          "type": "object",
+          "required": ["X", "Y"],
+          "properties": {
+            "X": { "type": "number" },
+            "Y": { "type": "number" }
+          },
+          "additionalProperties": false
+        },
+        "direction": { "type": "string", "enum": ["CW", "CCW"] }
+      },
+      "additionalProperties": true
+    },
+    "counterParams": {
+      "type": "object",
+      "required": ["name", "initial", "target", "increment"],
+      "properties": {
+        "name": { "type": "string" },
+        "initial": { "type": "integer" },
+        "target": { "type": "integer" },
+        "increment": { "type": "integer" },
+        "gotoNode": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "gotoParams": {
+      "type": "object",
+      "required": ["to"],
+      "properties": {
+        "to": { "type": "string" },
+        "description": { "type": "string" }
+      },
+      "additionalProperties": true
+    }
+  }
+}

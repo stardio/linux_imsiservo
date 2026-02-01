@@ -12,7 +12,7 @@
       "originalLabel": "REL MOVE",
       "x": 977.3333333333335,
       "y": 296,
-      "jsonData": null
+      "jsonData": "{\r\n  \u0022comment\u0022: \u0022aa\u0022,\r\n  \u0022axis\u0022: \u0022Y\u0022,\r\n  \u0022distance\u0022: {\r\n    \u0022value\u0022: 20000000,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  },\r\n  \u0022speed\u0022: {\r\n    \u0022value\u0022: 200000,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  }\r\n}"
     },
     {
       "nodeType": "REL_MOVE",
@@ -26,14 +26,14 @@
       "originalLabel": "REL MOVE",
       "x": 1069.3333333333333,
       "y": 418.6666666666667,
-      "jsonData": null
+      "jsonData": "{\r\n  \u0022comment\u0022: \u0022rr\u0022,\r\n  \u0022axis\u0022: \u0022Z\u0022,\r\n  \u0022distance\u0022: {\r\n    \u0022value\u0022: 5000,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  },\r\n  \u0022speed\u0022: {\r\n    \u0022value\u0022: 9000,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  }\r\n}"
     },
     {
       "nodeType": "LINEAR_MOVE",
       "originalLabel": "LINEAR MOVE",
       "x": 686.6666666666666,
       "y": 204.66666666666669,
-      "jsonData": null
+      "jsonData": "{\r\n  \u0022comment\u0022: \u0022tt\u0022,\r\n  \u0022target\u0022: {\r\n    \u0022X\u0022: {\r\n      \u0022value\u0022: 7777,\r\n      \u0022unit\u0022: \u0022Puls\u0022\r\n    },\r\n    \u0022Y\u0022: {\r\n      \u0022value\u0022: 40000,\r\n      \u0022unit\u0022: \u0022Puls\u0022\r\n    },\r\n    \u0022Z\u0022: {\r\n      \u0022value\u0022: 10000,\r\n      \u0022unit\u0022: \u0022Puls\u0022\r\n    }\r\n  },\r\n  \u0022speed\u0022: {\r\n    \u0022value\u0022: 300,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  }\r\n}"
     },
     {
       "nodeType": "CIRCULAR_MOVE",
@@ -54,7 +54,7 @@
       "originalLabel": "COUNTER",
       "x": 870.6666666666665,
       "y": 565.3333333333333,
-      "jsonData": null
+      "jsonData": "{\r\n  \u0022name\u0022: \u0022ct1\u0022,\r\n  \u0022initial\u0022: 1,\r\n  \u0022target\u0022: 10,\r\n  \u0022increment\u0022: 1,\r\n  \u0022gotoNode\u0022: \u0022(Node label or leave empty)\u0022\r\n}"
     },
     {
       "nodeType": "CIRCULAR_MOVE",
@@ -67,8 +67,8 @@
       "nodeType": "START",
       "originalLabel": "START",
       "x": 9.333333333333314,
-      "y": 350.6666666666667,
-      "jsonData": null
+      "y": 351.33333333333337,
+      "jsonData": "{}"
     },
     {
       "nodeType": "END",

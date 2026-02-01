@@ -1,0 +1,55 @@
+{
+  "protocol": "ethercat-sequence-exec",
+  "version": "1.0",
+  "requests": [
+    {
+      "type": "run",
+      "fields": {
+        "sequence_path": "string",
+        "mode": "live|sim",
+        "loop": "boolean"
+      }
+    },
+    {
+      "type": "stop",
+      "fields": {}
+    },
+    {
+      "type": "pause",
+      "fields": {}
+    },
+    {
+      "type": "resume",
+      "fields": {}
+    },
+    {
+      "type": "status",
+      "fields": {}
+    }
+  ],
+  "responses": [
+    {
+      "type": "ack",
+      "fields": {
+        "request_id": "string",
+        "ok": "boolean",
+        "message": "string"
+      }
+    },
+    {
+      "type": "status",
+      "fields": {
+        "state": "idle|running|paused|error",
+        "current_step": "string|null",
+        "message": "string"
+      }
+    },
+    {
+      "type": "event",
+      "fields": {
+        "level": "info|warn|error",
+        "message": "string"
+      }
+    }
+  ]
+}
