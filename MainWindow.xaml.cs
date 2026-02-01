@@ -388,6 +388,9 @@ namespace EtherCAT_Studio
                                 "START" => Brushes.LimeGreen,
                                 "END" => Brushes.Red,
                                 "LINEAR_MOVE" => Brushes.Blue,
+                                "REL_MOVE" => new SolidColorBrush(Color.FromRgb(0x1E, 0x88, 0xE5)), // Blue
+                                "CIRCULAR_MOVE" => new SolidColorBrush(Color.FromRgb(0x5E, 0x35, 0xB1)), // Purple
+                                "COUNTER" => new SolidColorBrush(Color.FromRgb(0xAB, 0x47, 0xBC)), // Purple
                                 _ => Brushes.Gray
                             };
 
@@ -442,7 +445,7 @@ namespace EtherCAT_Studio
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"불러오기 실패: {ex.Message}");
+                    MessageBox.Show($"불러오기 실패:\n{ex.Message}\n\n상세:\n{ex.StackTrace}");
                 }
             }
         }
@@ -511,6 +514,11 @@ namespace EtherCAT_Studio
                     "JUMP" => "GOTO",
                     "START" => "START",
                     "END" => "END",
+                    "LINEAR MOVE" => "LINEAR_MOVE",
+                    "LINEAR_MOVE" => "LINEAR_MOVE",
+                    "REL_MOVE" => "REL_MOVE",
+                    "CIRCULAR_MOVE" => "CIRCULAR_MOVE",
+                    "COUNTER" => "COUNTER",
                     "SYSTEM" => "SYSTEM",
                     _ => originalType
                 };
@@ -623,6 +631,68 @@ namespace EtherCAT_Studio
                                 string to = GetPropString(root, "to", "");
                                 string description = GetPropString(root, "description", "");
                                 paramsObj = new { to, description };
+                            }
+                            else if (type == "REL_MOVE")
+                            {
+                                string axis = GetPropString(root, "axis", "X");
+                                double distance = 0, speed = 0;
+                                
+                                if (root.TryGetProperty("distance", out var distProp))
+                                {
+                                    if (distProp.ValueKind == System.Text.Json.JsonValueKind.Object && distProp.TryGetProperty("value", out var distVal))
+                                    {
+                                        distance = distVal.TryGetDouble(out var d) ? d : 0;
+                                    }
+                                    else
+                                    {
+                                        distance = GetPropDouble(root, "distance", 0);
+                                    }
+                                }
+                                
+                                if (root.TryGetProperty("speed", out var speedProp))
+                                {
+                                    if (speedProp.ValueKind == System.Text.Json.JsonValueKind.Object && speedProp.TryGetProperty("value", out var speedVal))
+                                    {
+                                        speed = speedVal.TryGetDouble(out var s) ? s : 0;
+                                    }
+                                    else
+                                    {
+                                        speed = GetPropDouble(root, "speed", 0);
+                                    }
+                                }
+                                
+                                paramsObj = new { axis, distance, speed };
+                            }
+                            else if (type == "CIRCULAR_MOVE")
+                            {
+                                var center = new { X = 0.0, Y = 0.0 };
+                                var end = new { X = 0.0, Y = 0.0 };
+                                
+                                if (root.TryGetProperty("center", out var c))
+                                {
+                                    double cx = GetPropDouble(c, "X", 0);
+                                    double cy = GetPropDouble(c, "Y", 0);
+                                    center = new { X = cx, Y = cy };
+                                }
+                                
+                                if (root.TryGetProperty("end", out var endProp))
+                                {
+                                    double ex = GetPropDouble(endProp, "X", 0);
+                                    double ey = GetPropDouble(endProp, "Y", 0);
+                                    end = new { X = ex, Y = ey };
+                                }
+                                
+                                string direction = GetPropString(root, "direction", "CW");
+                                paramsObj = new { center, end, direction };
+                            }
+                            else if (type == "COUNTER")
+                            {
+                                string name = GetPropString(root, "name", "");
+                                int initial = (int)GetPropDouble(root, "initial", 0);
+                                int target = (int)GetPropDouble(root, "target", 0);
+                                int increment = (int)GetPropDouble(root, "increment", 1);
+                                string gotoNode = GetPropString(root, "gotoNode", "");
+                                paramsObj = new { name, initial, target, increment, gotoNode };
                             }
                             else
                             {

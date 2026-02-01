@@ -3,29 +3,29 @@
     {
       "nodeType": "REL_MOVE",
       "originalLabel": "REL MOVE",
-      "x": 30,
-      "y": 59.333333333333336,
-      "jsonData": null
+      "x": 36.666666666666686,
+      "y": 88.66666666666669,
+      "jsonData": "{\r\n  \u0022comment\u0022: \u0022sdf\u0022,\r\n  \u0022axis\u0022: \u0022Y\u0022,\r\n  \u0022distance\u0022: {\r\n    \u0022value\u0022: 222,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  },\r\n  \u0022speed\u0022: {\r\n    \u0022value\u0022: 333,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  }\r\n}"
     },
     {
       "nodeType": "REL_MOVE",
       "originalLabel": "REL MOVE",
-      "x": 1234,
-      "y": 241.33333333333331,
+      "x": 977.3333333333335,
+      "y": 296,
       "jsonData": null
     },
     {
       "nodeType": "REL_MOVE",
       "originalLabel": "REL MOVE",
       "x": 328.66666666666663,
-      "y": 304,
-      "jsonData": null
+      "y": 304.6666666666667,
+      "jsonData": "{\r\n  \u0022comment\u0022: \u0022qq\u0022,\r\n  \u0022axis\u0022: \u0022Y\u0022,\r\n  \u0022distance\u0022: {\r\n    \u0022value\u0022: 2345,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  },\r\n  \u0022speed\u0022: {\r\n    \u0022value\u0022: 2345,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  }\r\n}"
     },
     {
       "nodeType": "REL_MOVE",
       "originalLabel": "REL MOVE",
-      "x": 1418.6666666666667,
-      "y": 310,
+      "x": 1069.3333333333333,
+      "y": 418.6666666666667,
       "jsonData": null
     },
     {
@@ -38,22 +38,22 @@
     {
       "nodeType": "CIRCULAR_MOVE",
       "originalLabel": "CIRCULAR MOVE",
-      "x": 511.3333333333333,
+      "x": 511.33333333333326,
       "y": 252.66666666666674,
-      "jsonData": null
+      "jsonData": "{\r\n  \u0022comment\u0022: \u0022aa\u0022,\r\n  \u0022center\u0022: {\r\n    \u0022X\u0022: 1234,\r\n    \u0022Y\u0022: 3333\r\n  },\r\n  \u0022end\u0022: {\r\n    \u0022X\u0022: 123,\r\n    \u0022Y\u0022: 345\r\n  },\r\n  \u0022direction\u0022: \u0022CCW\u0022\r\n}"
     },
     {
       "nodeType": "WAIT",
       "originalLabel": "WAIT",
-      "x": 853.9999999999998,
-      "y": 274,
-      "jsonData": null
+      "x": 796.6666666666665,
+      "y": 433.3333333333333,
+      "jsonData": "{\r\n  \u0022label\u0022: \u0022dely\u0022,\r\n  \u0022comment\u0022: \u0022sss\u0022,\r\n  \u0022delay\u0022: {\r\n    \u0022value\u0022: 111,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  }\r\n}"
     },
     {
       "nodeType": "COUNTER",
       "originalLabel": "COUNTER",
-      "x": 1022.6666666666665,
-      "y": 216,
+      "x": 870.6666666666665,
+      "y": 565.3333333333333,
       "jsonData": null
     },
     {
@@ -61,7 +61,7 @@
       "originalLabel": "CIRCULAR MOVE",
       "x": 180,
       "y": 180,
-      "jsonData": null
+      "jsonData": "{\r\n  \u0022comment\u0022: \u0022wer\u0022,\r\n  \u0022center\u0022: {\r\n    \u0022X\u0022: 1111,\r\n    \u0022Y\u0022: 2222\r\n  },\r\n  \u0022end\u0022: {\r\n    \u0022X\u0022: 3333,\r\n    \u0022Y\u0022: 4444\r\n  },\r\n  \u0022direction\u0022: \u0022CCW\u0022\r\n}"
     },
     {
       "nodeType": "START",
@@ -73,8 +73,8 @@
     {
       "nodeType": "END",
       "originalLabel": "END",
-      "x": 1575.3333333333333,
-      "y": 414,
+      "x": 1119.3333333333335,
+      "y": 618.6666666666667,
       "jsonData": null
     }
   ],
