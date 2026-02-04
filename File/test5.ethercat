@@ -1,123 +1,57 @@
 {
   "nodes": [
     {
-      "nodeType": "REL_MOVE",
-      "originalLabel": "REL MOVE",
-      "x": 36.666666666666686,
-      "y": 88.66666666666669,
-      "jsonData": "{\r\n  \u0022comment\u0022: \u0022sdf\u0022,\r\n  \u0022axis\u0022: \u0022Y\u0022,\r\n  \u0022distance\u0022: {\r\n    \u0022value\u0022: 222,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  },\r\n  \u0022speed\u0022: {\r\n    \u0022value\u0022: 333,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  }\r\n}"
+      "nodeType": "MOTION",
+      "originalLabel": "ABS MOVE",
+      "x": 134.66666666666663,
+      "y": 48.666666666666686,
+      "jsonData": "{\r\n  \u0022type\u0022: \u0022ABS MOVE\u0022,\r\n  \u0022axis\u0022: \u0022X\u0022,\r\n  \u0022position\u0022: {\r\n    \u0022value\u0022: 100,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  },\r\n  \u0022speed\u0022: {\r\n    \u0022value\u0022: 244,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  },\r\n  \u0022comment\u0022: \u0022aa\u0022\r\n}"
+    },
+    {
+      "nodeType": "MOTION",
+      "originalLabel": "ABS MOVE",
+      "x": 345.33333333333326,
+      "y": 189.33333333333326,
+      "jsonData": "{\r\n  \u0022type\u0022: \u0022ABS MOVE\u0022,\r\n  \u0022axis\u0022: \u0022X\u0022,\r\n  \u0022position\u0022: {\r\n    \u0022value\u0022: 100,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  },\r\n  \u0022speed\u0022: {\r\n    \u0022value\u0022: 244,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  },\r\n  \u0022comment\u0022: \u0022aa\u0022\r\n}"
     },
     {
       "nodeType": "REL_MOVE",
       "originalLabel": "REL MOVE",
-      "x": 977.3333333333335,
-      "y": 296,
-      "jsonData": "{\r\n  \u0022comment\u0022: \u0022aa\u0022,\r\n  \u0022axis\u0022: \u0022Y\u0022,\r\n  \u0022distance\u0022: {\r\n    \u0022value\u0022: 20000000,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  },\r\n  \u0022speed\u0022: {\r\n    \u0022value\u0022: 200000,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  }\r\n}"
+      "x": 545.3333333333333,
+      "y": 316.6666666666667,
+      "jsonData": null
     },
     {
       "nodeType": "REL_MOVE",
       "originalLabel": "REL MOVE",
-      "x": 328.66666666666663,
-      "y": 304.6666666666667,
-      "jsonData": "{\r\n  \u0022comment\u0022: \u0022qq\u0022,\r\n  \u0022axis\u0022: \u0022Y\u0022,\r\n  \u0022distance\u0022: {\r\n    \u0022value\u0022: 2345,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  },\r\n  \u0022speed\u0022: {\r\n    \u0022value\u0022: 2345,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  }\r\n}"
-    },
-    {
-      "nodeType": "REL_MOVE",
-      "originalLabel": "REL MOVE",
-      "x": 1069.3333333333333,
-      "y": 418.6666666666667,
-      "jsonData": "{\r\n  \u0022comment\u0022: \u0022rr\u0022,\r\n  \u0022axis\u0022: \u0022Z\u0022,\r\n  \u0022distance\u0022: {\r\n    \u0022value\u0022: 5000,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  },\r\n  \u0022speed\u0022: {\r\n    \u0022value\u0022: 9000,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  }\r\n}"
+      "x": 532.6666666666666,
+      "y": 47.33333333333337,
+      "jsonData": null
     },
     {
       "nodeType": "LINEAR_MOVE",
       "originalLabel": "LINEAR MOVE",
-      "x": 686.6666666666666,
-      "y": 204.66666666666669,
-      "jsonData": "{\r\n  \u0022comment\u0022: \u0022tt\u0022,\r\n  \u0022target\u0022: {\r\n    \u0022X\u0022: {\r\n      \u0022value\u0022: 7777,\r\n      \u0022unit\u0022: \u0022Puls\u0022\r\n    },\r\n    \u0022Y\u0022: {\r\n      \u0022value\u0022: 40000,\r\n      \u0022unit\u0022: \u0022Puls\u0022\r\n    },\r\n    \u0022Z\u0022: {\r\n      \u0022value\u0022: 10000,\r\n      \u0022unit\u0022: \u0022Puls\u0022\r\n    }\r\n  },\r\n  \u0022speed\u0022: {\r\n    \u0022value\u0022: 300,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  }\r\n}"
-    },
-    {
-      "nodeType": "CIRCULAR_MOVE",
-      "originalLabel": "CIRCULAR MOVE",
-      "x": 511.33333333333326,
-      "y": 252.66666666666674,
-      "jsonData": "{\r\n  \u0022comment\u0022: \u0022aa\u0022,\r\n  \u0022center\u0022: {\r\n    \u0022X\u0022: 1234,\r\n    \u0022Y\u0022: 3333\r\n  },\r\n  \u0022end\u0022: {\r\n    \u0022X\u0022: 123,\r\n    \u0022Y\u0022: 345\r\n  },\r\n  \u0022direction\u0022: \u0022CCW\u0022\r\n}"
-    },
-    {
-      "nodeType": "WAIT",
-      "originalLabel": "WAIT",
-      "x": 796.6666666666665,
-      "y": 433.3333333333333,
-      "jsonData": "{\r\n  \u0022label\u0022: \u0022dely\u0022,\r\n  \u0022comment\u0022: \u0022sss\u0022,\r\n  \u0022delay\u0022: {\r\n    \u0022value\u0022: 111,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  }\r\n}"
-    },
-    {
-      "nodeType": "COUNTER",
-      "originalLabel": "COUNTER",
-      "x": 870.6666666666665,
-      "y": 565.3333333333333,
-      "jsonData": "{\r\n  \u0022name\u0022: \u0022ct1\u0022,\r\n  \u0022initial\u0022: 1,\r\n  \u0022target\u0022: 10,\r\n  \u0022increment\u0022: 1,\r\n  \u0022gotoNode\u0022: \u0022(Node label or leave empty)\u0022\r\n}"
-    },
-    {
-      "nodeType": "CIRCULAR_MOVE",
-      "originalLabel": "CIRCULAR MOVE",
-      "x": 180,
-      "y": 180,
-      "jsonData": "{\r\n  \u0022comment\u0022: \u0022wer\u0022,\r\n  \u0022center\u0022: {\r\n    \u0022X\u0022: 1111,\r\n    \u0022Y\u0022: 2222\r\n  },\r\n  \u0022end\u0022: {\r\n    \u0022X\u0022: 3333,\r\n    \u0022Y\u0022: 4444\r\n  },\r\n  \u0022direction\u0022: \u0022CCW\u0022\r\n}"
-    },
-    {
-      "nodeType": "START",
-      "originalLabel": "START",
-      "x": 9.333333333333314,
-      "y": 351.33333333333337,
-      "jsonData": "{}"
-    },
-    {
-      "nodeType": "END",
-      "originalLabel": "END",
-      "x": 1119.3333333333335,
-      "y": 618.6666666666667,
+      "x": 147.33333333333331,
+      "y": 381.3333333333333,
       "jsonData": null
     }
   ],
   "connections": [
     {
+      "fromNodeIndex": 0,
+      "toNodeIndex": 1
+    },
+    {
+      "fromNodeIndex": 1,
+      "toNodeIndex": 2
+    },
+    {
       "fromNodeIndex": 1,
       "toNodeIndex": 3
     },
     {
-      "fromNodeIndex": 7,
-      "toNodeIndex": 1
-    },
-    {
-      "fromNodeIndex": 6,
-      "toNodeIndex": 7
-    },
-    {
-      "fromNodeIndex": 5,
-      "toNodeIndex": 4
-    },
-    {
       "fromNodeIndex": 4,
-      "toNodeIndex": 6
-    },
-    {
-      "fromNodeIndex": 2,
-      "toNodeIndex": 5
-    },
-    {
-      "fromNodeIndex": 8,
-      "toNodeIndex": 2
-    },
-    {
-      "fromNodeIndex": 0,
-      "toNodeIndex": 8
-    },
-    {
-      "fromNodeIndex": 9,
-      "toNodeIndex": 0
-    },
-    {
-      "fromNodeIndex": 3,
-      "toNodeIndex": 10
+      "toNodeIndex": 1
     }
   ]
 }

@@ -1,35 +1,46 @@
 {
   "nodes": [
     {
-      "nodeType": "MOTION",
-      "originalLabel": "ABS MOVE",
-      "x": 219.33333333333331,
-      "y": 166,
-      "jsonData": "{\r\n  \u0022type\u0022: \u0022ABS MOVE\u0022,\r\n  \u0022axis\u0022: \u0022Y\u0022,\r\n  \u0022position\u0022: {\r\n    \u0022value\u0022: 1000,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  },\r\n  \u0022speed\u0022: {\r\n    \u0022value\u0022: 2000,\r\n    \u0022unit\u0022: \u0022Puls\u0022\r\n  },\r\n  \u0022label\u0022: \u0022axis1\u0022,\r\n  \u0022comment\u0022: \u0022aa\u0022\r\n}"
-    },
-    {
       "nodeType": "START",
       "originalLabel": "START",
-      "x": 23.333333333333314,
-      "y": 105.33333333333334,
-      "jsonData": "{\r\n  \u0022label\u0022: \u0022start\u0022,\r\n  \u0022comment\u0022: \u0022ss\u0022\r\n}"
+      "x": 95.99999999999994,
+      "y": 52,
+      "jsonData": "{\n        \u0022delay_ms\u0022: 2000\n      }"
+    },
+    {
+      "nodeType": "MOTION",
+      "originalLabel": "MOTION",
+      "x": 244.0000000000001,
+      "y": 209.33333333333331,
+      "jsonData": "{}"
+    },
+    {
+      "nodeType": "WAIT",
+      "originalLabel": "WAIT",
+      "x": 438,
+      "y": 69.33333333333333,
+      "jsonData": "{\n        \u0022delay_ms\u0022: 2000\n      }"
     },
     {
       "nodeType": "END",
       "originalLabel": "END",
-      "x": 433.33333333333337,
-      "y": 257.33333333333337,
-      "jsonData": "{\r\n  \u0022label\u0022: \u0022end\u0022,\r\n  \u0022comment\u0022: \u00222\u0022\r\n}"
+      "x": 582.6666666666667,
+      "y": 230.66666666666669,
+      "jsonData": "{}"
     }
   ],
   "connections": [
     {
-      "fromNodeIndex": 1,
-      "toNodeIndex": 0
+      "fromNodeIndex": 0,
+      "toNodeIndex": 1
     },
     {
-      "fromNodeIndex": 0,
+      "fromNodeIndex": 1,
       "toNodeIndex": 2
+    },
+    {
+      "fromNodeIndex": 2,
+      "toNodeIndex": 3
     }
   ]
 }

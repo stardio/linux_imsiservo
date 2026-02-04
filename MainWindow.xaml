@@ -1,4 +1,4 @@
-﻿<Window x:Class="EtherCAT_Studio.MainWindow"
+<Window x:Class="EtherCAT_Studio.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="EtherCAT Studio" Height="600" Width="1000"
@@ -24,37 +24,69 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- Menu dark theme -->
+        <Style TargetType="Menu">
+            <Setter Property="Background" Value="#232323"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        <Style TargetType="MenuItem">
+            <Setter Property="Background" Value="#232323"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
     </Window.Resources>
 
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="150"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <!-- Toolbox -->
-        <StackPanel Grid.Column="0" Background="#232323" Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="150">
-            <Button Content="ABS MOVE" ToolTip="위치 제어 (절대 이동)" Background="#2176FF" Foreground="White" FontSize="14" Click="AddMotionNode_Click" Style="{StaticResource ToolButtonStyle}"/>
-            <Button Content="REL MOVE" ToolTip="상대 이동" Background="#1E88E5" Foreground="White" FontSize="14" Click="AddRelMoveNode_Click" Style="{StaticResource ToolButtonStyle}"/>
-            <Button Content="LINEAR MOVE" ToolTip="선형 이동" Background="#3B82F6" Foreground="White" FontSize="14" Click="AddLinearMoveNode_Click" Style="{StaticResource ToolButtonStyle}"/>
-            <Button Content="CIRCULAR MOVE" ToolTip="원호 이동" Background="#5E35B1" Foreground="White" FontSize="12" Click="AddCircularMoveNode_Click" Style="{StaticResource ToolButtonStyle}"/>
-            <Button Content="WAIT" ToolTip="시간 지연" Background="#FF8800" Foreground="White" FontSize="16" Click="AddWaitNode_Click" Style="{StaticResource ToolButtonStyle}"/>
-            <Button Content="COUNTER" ToolTip="카운터" Background="#AB47BC" Foreground="White" FontSize="14" Click="AddCounterNode_Click" Style="{StaticResource ToolButtonStyle}"/>
-            <Button Content="SET DO" ToolTip="신호 출력" Background="#22C55E" Foreground="White" FontSize="14" Click="AddSetDo_Click" Style="{StaticResource ToolButtonStyle}"/>
-            <Button Content="CHECK DI" ToolTip="센서 확인" Background="#F59E0B" Foreground="White" FontSize="14" Click="AddCheckDi_Click" Style="{StaticResource ToolButtonStyle}"/>
-            <Button Content="GOTO" ToolTip="반복/이동" Background="#FF3B30" Foreground="White" FontSize="16" Click="AddGoto_Click" Style="{StaticResource ToolButtonStyle}"/>
-            <Button Content="START" ToolTip="시퀀스 시작" Background="#10B981" Foreground="White" FontSize="16" Click="AddStartNode_Click" Style="{StaticResource ToolButtonStyle}"/>
-            <Button Content="END" ToolTip="시퀀스 종료" Background="#EF4444" Foreground="White" FontSize="16" Click="AddEndNode_Click" Style="{StaticResource ToolButtonStyle}"/>
-            <!-- File Management Section -->
-            <Separator Margin="6,20,6,12" Background="#444"/>
-            <Button Content="LOAD" ToolTip="파일에서 불러오기" Background="#10B981" Foreground="White" FontSize="16" Click="LoadFile_Click" Style="{StaticResource ToolButtonStyle}"/>
-            <Button Content="SAVE" ToolTip="파일로 저장" Background="#0078D7" Foreground="White" FontSize="16" Click="SaveFile_Click" Style="{StaticResource ToolButtonStyle}"/>
-            <Separator Margin="6,12,6,12" Background="#444"/>
-            <Button Content="Export JSON" ToolTip="JSON 내보내기" Background="#6366F1" Foreground="White" FontSize="14" Click="SaveJson_Click" Style="{StaticResource ToolButtonStyle}"/>
-            <Button Content="Run Sequence" ToolTip="시퀀스 실행 (시뮬레이션)" Background="#28A745" Foreground="White" FontSize="14" Click="RunSequence_Click" Style="{StaticResource ToolButtonStyle}"/>
-        </StackPanel>
-        <!-- Main Canvas with Scrolling -->
-        <ScrollViewer Grid.Column="1" Background="#232323" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <Canvas x:Name="MainCanvas" Background="#232323" Width="2000" Height="2000"/>
-        </ScrollViewer>
-    </Grid>
+    <DockPanel>
+        <!-- Menu Bar -->
+        <Menu DockPanel.Dock="Top" Background="#232323">
+            <MenuItem Header="파일" Foreground="White">
+                <MenuItem Header="LOAD" Click="LoadFile_Click"/>
+                <MenuItem Header="SAVE" Click="SaveFile_Click"/>
+                <Separator/>
+                <MenuItem Header="Export JSON" Click="SaveJson_Click"/>
+                <Separator/>
+                <MenuItem Header="종료" Click="MenuItem_Exit"/>
+            </MenuItem>
+            <MenuItem Header="AI" Foreground="White">
+                <MenuItem Header="AI 프롬프트로 생성" Click="MenuItem_AIGenerate_Click"/>
+                <MenuItem Header="Ollama 설정" Click="MenuItem_OllamaSettings_Click"/>
+            </MenuItem>
+            <MenuItem Header="도구" Foreground="White">
+                <MenuItem Header="Run Sequence" Click="RunSequence_Click"/>
+            </MenuItem>
+        </Menu>
+
+        <!-- Main Grid -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <!-- Toolbox -->
+            <StackPanel Grid.Column="0" Background="#232323" Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="150">
+                <Button Content="ABS MOVE" ToolTip="위치 제어 (절대 이동)" Background="#2176FF" Foreground="White" FontSize="14" Click="AddMotionNode_Click" Style="{StaticResource ToolButtonStyle}"/>
+                <Button Content="REL MOVE" ToolTip="상대 이동" Background="#1E88E5" Foreground="White" FontSize="14" Click="AddRelMoveNode_Click" Style="{StaticResource ToolButtonStyle}"/>
+                <Button Content="LINEAR MOVE" ToolTip="선형 이동" Background="#3B82F6" Foreground="White" FontSize="14" Click="AddLinearMoveNode_Click" Style="{StaticResource ToolButtonStyle}"/>
+                <Button Content="CIRCULAR MOVE" ToolTip="원호 이동" Background="#5E35B1" Foreground="White" FontSize="12" Click="AddCircularMoveNode_Click" Style="{StaticResource ToolButtonStyle}"/>
+                <Button Content="WAIT" ToolTip="시간 지연" Background="#FF8800" Foreground="White" FontSize="16" Click="AddWaitNode_Click" Style="{StaticResource ToolButtonStyle}"/>
+                <Button Content="COUNTER" ToolTip="카운터" Background="#AB47BC" Foreground="White" FontSize="14" Click="AddCounterNode_Click" Style="{StaticResource ToolButtonStyle}"/>
+                <Button Content="SET DO" ToolTip="신호 출력" Background="#22C55E" Foreground="White" FontSize="14" Click="AddSetDo_Click" Style="{StaticResource ToolButtonStyle}"/>
+                <Button Content="CHECK DI" ToolTip="센서 확인" Background="#F59E0B" Foreground="White" FontSize="14" Click="AddCheckDi_Click" Style="{StaticResource ToolButtonStyle}"/>
+                <Button Content="GOTO" ToolTip="반복/이동" Background="#FF3B30" Foreground="White" FontSize="16" Click="AddGoto_Click" Style="{StaticResource ToolButtonStyle}"/>
+                <Button Content="START" ToolTip="시퀀스 시작" Background="#10B981" Foreground="White" FontSize="16" Click="AddStartNode_Click" Style="{StaticResource ToolButtonStyle}"/>
+                <Button Content="END" ToolTip="시퀀스 종료" Background="#EF4444" Foreground="White" FontSize="16" Click="AddEndNode_Click" Style="{StaticResource ToolButtonStyle}"/>
+                <!-- File Management Section -->
+                <Separator Margin="6,20,6,12" Background="#444"/>
+                <Button Content="LOAD" ToolTip="파일에서 불러오기" Background="#10B981" Foreground="White" FontSize="16" Click="LoadFile_Click" Style="{StaticResource ToolButtonStyle}"/>
+                <Button Content="SAVE" ToolTip="파일로 저장" Background="#0078D7" Foreground="White" FontSize="16" Click="SaveFile_Click" Style="{StaticResource ToolButtonStyle}"/>
+                <Separator Margin="6,12,6,12" Background="#444"/>
+                <Button Content="Export JSON" ToolTip="JSON 내보내기" Background="#6366F1" Foreground="White" FontSize="14" Click="SaveJson_Click" Style="{StaticResource ToolButtonStyle}"/>
+                <Button Content="Run Sequence" ToolTip="시퀀스 실행 (시뮬레이션)" Background="#28A745" Foreground="White" FontSize="14" Click="RunSequence_Click" Style="{StaticResource ToolButtonStyle}"/>
+            </StackPanel>
+            <!-- Main Canvas with Scrolling -->
+            <ScrollViewer Grid.Column="1" Background="#232323" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <Canvas x:Name="MainCanvas" Background="#232323" Width="2000" Height="2000"/>
+            </ScrollViewer>
+        </Grid>
+    </DockPanel>
 </Window>

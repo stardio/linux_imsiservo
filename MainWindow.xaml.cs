@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Text.Json;
 
 namespace EtherCAT_Studio
 {
@@ -1144,6 +1145,272 @@ namespace EtherCAT_Studio
                 Owner = this
             };
             debugWindow.ShowDialog();
+        }
+
+        // =============== AI SEQUENCE GENERATION ===============
+        private string _ollamaBaseUrl = "http://localhost:11434";
+
+        private async void MenuItem_AIGenerate_Click(object sender, RoutedEventArgs e)
+        {
+            var promptWindow = new Window
+            {
+                Title = "AI 프롬프트로 시퀀스 생성",
+                Width = 600,
+                Height = 400,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Owner = this,
+                Background = new SolidColorBrush(Color.FromRgb(45, 45, 45))
+            };
+
+            var promptControl = new AIPromptWindow
+            {
+                OllamaBaseUrl = _ollamaBaseUrl
+            };
+            promptWindow.Content = promptControl;
+
+            promptWindow.ShowDialog();
+
+            if (promptControl.IsConfirmed && !string.IsNullOrEmpty(promptControl.GeneratedJson))
+            {
+                try
+                {
+                    LoadSequenceJsonIntoCanvas(promptControl.GeneratedJson);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"노드 생성 실패: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void LoadSequenceJsonIntoCanvas(string jsonStr)
+        {
+            using var doc = JsonDocument.Parse(jsonStr);
+            var root = doc.RootElement;
+
+            if (root.TryGetProperty("steps", out var stepsArray))
+            {
+                var nodeMap = new Dictionary<string, NodeControl>();
+                var nodes = new List<(int index, NodeControl node, string? id)>();
+                int nodeCount = 0;
+                int yOffset = 50;
+
+                // 첫 번째 패스: 모든 노드 생성
+                foreach (var stepData in stepsArray.EnumerateArray())
+                {
+                    try
+                    {
+                        string type = stepData.TryGetProperty("type", out var typeEl) 
+                            ? typeEl.GetString() ?? "MOTION" 
+                            : "MOTION";
+                        string? stepId = stepData.TryGetProperty("id", out var idEl)
+                            ? idEl.GetString()
+                            : null;
+                        
+                        var paramData = stepData.TryGetProperty("params", out var paramsEl) 
+                            ? paramsEl 
+                            : stepData;
+                        string jsonDataStr = paramData.GetRawText();
+
+                        // 노드 타입에 맞는 색상 결정
+                        Brush color = type switch
+                        {
+                            "MOTION" => Brushes.CornflowerBlue,
+                            "WAIT" => Brushes.Orange,
+                            "SET_DO" => Brushes.LimeGreen,
+                            "CHECK_DI" => Brushes.Gold,
+                            "GOTO" => Brushes.IndianRed,
+                            "JUMP" => Brushes.MediumPurple,
+                            "START" => Brushes.LimeGreen,
+                            "END" => Brushes.Red,
+                            "LINEAR_MOVE" => Brushes.Blue,
+                            "REL_MOVE" => new SolidColorBrush(Color.FromRgb(0x1E, 0x88, 0xE5)),
+                            "CIRCULAR_MOVE" => new SolidColorBrush(Color.FromRgb(0x5E, 0x35, 0xB1)),
+                            "COUNTER" => new SolidColorBrush(Color.FromRgb(0xAB, 0x47, 0xBC)),
+                            _ => Brushes.Gray
+                        };
+
+                        bool hasInput = type != "START";
+                        bool hasOutput = type != "END";
+
+                        var node = new NodeControl(type, color, this, 16, 140, 48, hasInput, hasOutput, type)
+                        {
+                            JsonData = jsonDataStr
+                        };
+                        node.Label.Text = type;
+
+                        // 자동 배치 (위에서 아래로, 열 3개)
+                        Canvas.SetLeft(node, 100 + (nodeCount % 3) * 220);
+                        Canvas.SetTop(node, yOffset + (nodeCount / 3) * 150);
+
+                        MainCanvas.Children.Add(node);
+                        nodes.Add((nodeCount, node, stepId));
+                        if (!string.IsNullOrEmpty(stepId))
+                        {
+                            nodeMap[stepId] = node;
+                        }
+                        nodeCount++;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"노드 파싱 오류: {ex.Message}\n\n{stepData.GetRawText()}");
+                    }
+                }
+
+                // 두 번째 패스: 순차적으로 와이어 연결
+                for (int i = 0; i < nodes.Count - 1; i++)
+                {
+                    var fromNode = nodes[i].node;
+                    var toNode = nodes[i + 1].node;
+
+                    if (fromNode.OutputPort != null && toNode.InputPort != null)
+                    {
+                        // 와이어 자동 연결
+                        ConnectNodes(fromNode, toNode);
+                    }
+                }
+
+                MessageBox.Show($"✓ {nodeCount}개의 노드가 생성되었습니다! ({nodeCount - 1}개 와이어 연결됨)", "성공", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show("JSON에 'steps' 배열이 없습니다.\n\n원본:\n" + jsonStr);
+            }
+        }
+
+        private void ConnectNodes(NodeControl fromNode, NodeControl toNode)
+        {
+            if (fromNode.OutputPort == null || toNode.InputPort == null)
+                return;
+
+            var from = new PortInfo { Type = PortType.Output, Node = fromNode, Ellipse = fromNode.OutputPort };
+            var to = new PortInfo { Type = PortType.Input, Node = toNode, Ellipse = toNode.InputPort };
+
+            var path = new Path
+            {
+                Stroke = Brushes.White,
+                StrokeThickness = 2,
+                StrokeDashArray = new DoubleCollection { 5, 5 }
+            };
+
+            var pathData = new PathGeometry();
+            var connection = new Connection { From = from, To = to, Path = path };
+            _connections.Add(connection);
+
+            path.Data = pathData;
+            MainCanvas.Children.Add(path);
+
+            UpdateWire(connection);
+        }
+
+        private void UpdateWire(Connection conn)
+        {
+            if (conn.From?.Ellipse == null || conn.To?.Ellipse == null || conn.Path?.Data is not PathGeometry pg)
+                return;
+
+            var from = conn.From.Ellipse;
+            var to = conn.To.Ellipse;
+
+            double x1 = Canvas.GetLeft(from) + from.Width / 2;
+            double y1 = Canvas.GetTop(from) + from.Height / 2;
+            double x2 = Canvas.GetLeft(to) + to.Width / 2;
+            double y2 = Canvas.GetTop(to) + to.Height / 2;
+
+            pg.Clear();
+            var fig = new PathFigure { StartPoint = new Point(x1, y1) };
+            fig.Segments.Add(new LineSegment { Point = new Point(x2, y2) });
+            pg.Figures.Add(fig);
+        }
+
+        private void MenuItem_OllamaSettings_Click(object sender, RoutedEventArgs e)
+        {
+            string? result = InputBoxDialog("Ollama 서버 설정", "URL (예: http://localhost:11434):", _ollamaBaseUrl);
+            if (!string.IsNullOrEmpty(result))
+            {
+                _ollamaBaseUrl = result;
+                MessageBox.Show($"✓ Ollama 설정 완료: {_ollamaBaseUrl}", "설정됨", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        private void MenuItem_Exit(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private static string? InputBoxDialog(string title, string prompt, string defaultValue = "")
+        {
+            var window = new Window
+            {
+                Title = title,
+                Width = 450,
+                Height = 180,
+                WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                Background = new SolidColorBrush(Color.FromRgb(45, 45, 45)),
+                Foreground = Brushes.White,
+                FontFamily = new FontFamily("Segoe UI")
+            };
+
+            var panel = new StackPanel { Margin = new Thickness(15) };
+
+            var lblPrompt = new TextBlock
+            {
+                Text = prompt,
+                Foreground = Brushes.White,
+                Margin = new Thickness(0, 0, 0, 8),
+                FontSize = 12
+            };
+            panel.Children.Add(lblPrompt);
+
+            var textBox = new TextBox
+            {
+                Text = defaultValue,
+                Background = new SolidColorBrush(Color.FromRgb(60, 60, 60)),
+                Foreground = Brushes.White,
+                Margin = new Thickness(0, 0, 0, 12),
+                Padding = new Thickness(8),
+                FontFamily = new FontFamily("Consolas"),
+                FontSize = 11
+            };
+            panel.Children.Add(textBox);
+
+            var btnPanel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                Margin = new Thickness(0, 8, 0, 0)
+            };
+
+            var okBtn = new Button
+            {
+                Content = "OK",
+                Width = 80,
+                Margin = new Thickness(4),
+                Background = new SolidColorBrush(Color.FromRgb(0, 120, 212)),
+                Foreground = Brushes.White,
+                Padding = new Thickness(8, 4, 8, 4)
+            };
+
+            var cancelBtn = new Button
+            {
+                Content = "Cancel",
+                Width = 80,
+                Margin = new Thickness(4),
+                Background = new SolidColorBrush(Color.FromRgb(108, 117, 125)),
+                Foreground = Brushes.White,
+                Padding = new Thickness(8, 4, 8, 4)
+            };
+
+            string? result = null;
+            okBtn.Click += (s, e) => { result = textBox.Text; window.Close(); };
+            cancelBtn.Click += (s, e) => window.Close();
+
+            btnPanel.Children.Add(okBtn);
+            btnPanel.Children.Add(cancelBtn);
+            panel.Children.Add(btnPanel);
+
+            window.Content = panel;
+            window.ShowDialog();
+            return result;
         }
     }
 }
